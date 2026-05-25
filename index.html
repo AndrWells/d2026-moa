@@ -16,6 +16,38 @@
       --line-2: #1f1f1f;
       --white: #f5f5f5;
       --black: #000;
+      --danger: #b00020;
+      --danger-border: #ff3b3b;
+    }
+
+    body.theme-light {
+      --bg: #f3f3f3;
+      --panel: #ffffff;
+      --panel-2: #eeeeee;
+      --text: #121212;
+      --muted: #555;
+      --faint: #888;
+      --line: #cfcfcf;
+      --line-2: #dedede;
+      --white: #000;
+      --black: #fff;
+      --danger: #b00020;
+      --danger-border: #7a0014;
+    }
+
+    body.theme-dark {
+      --bg: #080808;
+      --panel: #101010;
+      --panel-2: #151515;
+      --text: #e8e8e8;
+      --muted: #9a9a9a;
+      --faint: #666;
+      --line: #303030;
+      --line-2: #1f1f1f;
+      --white: #f5f5f5;
+      --black: #000;
+      --danger: #b00020;
+      --danger-border: #ff3b3b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -134,7 +166,8 @@
       flex-wrap: wrap;
     }
 
-    .auth-btn {
+    .auth-btn,
+    .nav-btn {
       border: 1px solid var(--white);
       background: var(--white);
       color: var(--black);
@@ -148,10 +181,49 @@
       white-space: nowrap;
     }
 
-    .auth-btn:hover {
+    .auth-btn:hover,
+    .nav-btn:hover {
       background: var(--black);
       color: var(--white);
       border-color: var(--white);
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .settings-page {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .settings-page h2 {
+      font-size: 22px;
+      text-transform: uppercase;
+      letter-spacing: -0.8px;
+      margin-bottom: 14px;
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 12px;
+      align-items: center;
+      border-top: 1px solid var(--line-2);
+      padding-top: 14px;
+    }
+
+    .settings-row label {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.4px;
     }
 
     .hidden {
@@ -219,6 +291,7 @@
       background: var(--panel);
       border: 1px solid var(--line);
       padding: 14px;
+      padding-bottom: 62px;
       display: flex;
       flex-direction: column;
       gap: 11px;
@@ -398,6 +471,59 @@
       border-color: var(--white);
     }
 
+    .delete-artist-btn {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 4;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      background: var(--black);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: width 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .delete-artist-btn:hover {
+      width: 86px;
+      background: var(--danger);
+      border-color: var(--danger-border);
+      color: #fff;
+    }
+
+    .delete-artist-btn .delete-icon,
+    .delete-artist-btn .delete-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 140ms ease;
+    }
+
+    .delete-artist-btn .delete-icon {
+      opacity: 1;
+      font-size: 15px;
+    }
+
+    .delete-artist-btn .delete-text {
+      opacity: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .delete-artist-btn:hover .delete-icon { opacity: 0; }
+    .delete-artist-btn:hover .delete-text { opacity: 1; }
+
     .empty {
       grid-column: 1 / -1;
       padding: 24px;
@@ -523,7 +649,9 @@
     @media (max-width: 760px) {
       body { padding: 10px; }
       .hero { padding: 14px; flex-direction: column; align-items: stretch; }
-      .hero .auth-btn { width: 100%; }
+      .hero-actions { width: 100%; flex-direction: column; align-items: stretch; }
+      .hero .auth-btn, .hero .nav-btn { width: 100%; }
+      .settings-row { grid-template-columns: 1fr; }
       .grid, .stats, .filters-grid { grid-template-columns: 1fr; }
       .count-row { flex-direction: column; align-items: flex-start; }
     }
@@ -542,9 +670,26 @@
   <div class="container">
     <section class="hero">
       <h1>@DRUSKHI OUTREACH DASHBOARD</h1>
-      <button class="auth-btn" id="authBtn" onclick="toggleAuth()">Sign in Google</button>
+      <div class="hero-actions">
+        <button class="nav-btn" id="dashboardNavBtn" onclick="showDashboardPage()">Dashboard</button>
+        <button class="nav-btn" id="settingsNavBtn" onclick="showSettingsPage()">Settings</button>
+        <button class="auth-btn" id="authBtn" onclick="toggleAuth()">Sign in Google</button>
+      </div>
     </section>
 
+    <section class="settings-page hidden" id="settingsPage">
+      <h2>Settings</h2>
+      <div class="settings-row">
+        <label for="themeSelect">Theme</label>
+        <select id="themeSelect" onchange="changeTheme(this.value)">
+          <option value="system">Use system default</option>
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+    </section>
+
+    <div id="dashboardPage">
     <section class="stats">
       <div class="stat"><strong id="totalStat">0</strong><span>Total</span></div>
       <div class="stat"><strong id="userStat">0</strong><span>User</span></div>
@@ -579,6 +724,7 @@
     </div>
 
     <main class="grid" id="artistGrid"></main>
+    </div>
   </div>
 
   <button class="add-artist-btn" onclick="openAddArtistModal()">+ Add Artist</button>
@@ -675,7 +821,9 @@
     let firebaseOnline = false;
 
     const STORAGE_KEY = "artistOutreachDashboard.v4";
+    const THEME_KEY = "artistOutreachDashboard.theme.v1";
     const CUSTOM_ARTISTS_KEY = "artistOutreachDashboard.customArtists.v1";
+    const DELETED_ARTISTS_KEY = "artistOutreachDashboard.deletedArtists.v1";
     const OLD_STORAGE_KEY = "artistOutreachDashboard.v2";
     const priorityOrder = { USER: 4, High: 3, Medium: 2, Low: 1 };
     const editingCards = new Set();
@@ -708,7 +856,8 @@
 
     let state = loadState();
     let customArtists = loadCustomArtists();
-    let artists = mergeSavedState([...baseArtists, ...customArtists], state);
+    let deletedArtistIds = loadDeletedArtists();
+    let artists = mergeSavedState([...baseArtists, ...customArtists], state).filter(artist => !deletedArtistIds.includes(artist.id));
 
     const grid = document.getElementById("artistGrid");
     const searchInput = document.getElementById("searchInput");
@@ -717,6 +866,9 @@
     const sortSelect = document.getElementById("sortSelect");
     const resultCount = document.getElementById("resultCount");
     const saveStatus = document.getElementById("saveStatus");
+    const settingsPage = document.getElementById("settingsPage");
+    const dashboardPage = document.getElementById("dashboardPage");
+    const themeSelect = document.getElementById("themeSelect");
     const appShell = document.getElementById("appShell");
     const authGate = document.getElementById("authGate");
     const authGateNotice = document.getElementById("authGateNotice");
@@ -724,6 +876,36 @@
     const gateAuthBtn = document.getElementById("gateAuthBtn");
 
     function slug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
+
+    function getSystemTheme() {
+      return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    }
+
+    function applyThemePreference(preference) {
+      const resolvedTheme = preference === "system" ? getSystemTheme() : preference;
+      document.body.classList.remove("theme-light", "theme-dark");
+      document.body.classList.add(resolvedTheme === "light" ? "theme-light" : "theme-dark");
+      if (themeSelect) themeSelect.value = preference;
+    }
+
+    function loadThemePreference() {
+      return localStorage.getItem(THEME_KEY) || "system";
+    }
+
+    function changeTheme(value) {
+      localStorage.setItem(THEME_KEY, value);
+      applyThemePreference(value);
+    }
+
+    function showSettingsPage() {
+      dashboardPage.classList.add("hidden");
+      settingsPage.classList.remove("hidden");
+    }
+
+    function showDashboardPage() {
+      settingsPage.classList.add("hidden");
+      dashboardPage.classList.remove("hidden");
+    }
     function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }
 
     function loadState() {
@@ -742,6 +924,18 @@
       } catch (e) {
         return [];
       }
+    }
+
+    function loadDeletedArtists() {
+      try {
+        return JSON.parse(localStorage.getItem(DELETED_ARTISTS_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveDeletedArtists() {
+      localStorage.setItem(DELETED_ARTISTS_KEY, JSON.stringify(deletedArtistIds));
     }
 
     function saveCustomArtists() {
@@ -813,7 +1007,9 @@
 
           state = cloudState;
           customArtists = cloudCustomArtists;
-          artists = mergeSavedState([...baseArtists, ...customArtists], state);
+          deletedArtistIds = Array.isArray(cloud.deletedArtistIds) ? cloud.deletedArtistIds : loadDeletedArtists();
+          localStorage.setItem(DELETED_ARTISTS_KEY, JSON.stringify(deletedArtistIds));
+          artists = mergeSavedState([...baseArtists, ...customArtists], state).filter(artist => !deletedArtistIds.includes(artist.id));
           populateRegions();
           renderArtists();
           saveStatus.textContent = "Cloud loaded";
@@ -870,6 +1066,7 @@
         await setDoc(firebaseDocRef, {
           state: payload,
           customArtists,
+          deletedArtistIds,
           updatedAt: serverTimestamp()
         }, { merge: true });
         saveStatus.textContent = "Saved cloud " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
@@ -987,6 +1184,11 @@
                 <div class="note-label"><span>Notes</span><span>Autosaved</span></div>
                 <textarea placeholder="NOTES" oninput="changeNote('${artist.id}', this.value)">${escapeHtml(artist.note || "")}</textarea>
               </div>
+
+              <button class="delete-artist-btn" title="Delete artist" onclick="deleteArtist('${artist.id}')">
+                <span class="delete-icon">⌫</span>
+                <span class="delete-text">DELETE</span>
+              </button>
             </article>
 
             <article class="card-back">
@@ -1036,6 +1238,11 @@
                 <button onclick="flipCard('${artist.id}', false)">Done</button>
                 <button onclick="openAllLinks('${artist.id}')">Open Links</button>
               </div>
+
+              <button class="delete-artist-btn" title="Delete artist" onclick="deleteArtist('${artist.id}')">
+                <span class="delete-icon">⌫</span>
+                <span class="delete-text">DELETE</span>
+              </button>
             </article>
           </div>
         </section>
@@ -1108,6 +1315,25 @@
       const artist = artists.find(a => a.id === id);
       if (!artist) return;
       Object.values(artist.socials || {}).filter(Boolean).forEach(url => window.open(url, "_blank"));
+    }
+
+    async function deleteArtist(id) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+
+      const confirmed = confirm(`Delete ${artist.name}?`);
+      if (!confirmed) return;
+
+      deletedArtistIds = Array.from(new Set([...deletedArtistIds, id]));
+      customArtists = customArtists.filter(customArtist => slug(customArtist.name) !== id);
+      artists = artists.filter(a => a.id !== id);
+      editingCards.delete(id);
+
+      saveDeletedArtists();
+      saveCustomArtists();
+      populateRegions();
+      await saveState();
+      renderArtists();
     }
 
     function updateStats() {
@@ -1202,9 +1428,19 @@
     window.changeSocial = changeSocial;
     window.changeCustomTags = changeCustomTags;
     window.openAllLinks = openAllLinks;
+    window.deleteArtist = deleteArtist;
     window.toggleAuth = toggleAuth;
+    window.changeTheme = changeTheme;
+    window.showSettingsPage = showSettingsPage;
+    window.showDashboardPage = showDashboardPage;
 
     async function initApp() {
+      applyThemePreference(loadThemePreference());
+      if (window.matchMedia) {
+        window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
+          if (loadThemePreference() === "system") applyThemePreference("system");
+        });
+      }
       setSignedInUi(false, "Checking sign-in...");
       await initFirebaseCloud();
     }
