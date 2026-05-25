@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@DRUSKHI OUTREACH DASHBOARD</title>
+  <style>
+    :root {
+      --bg: #080808;
+      --panel: #101010;
+      --panel-2: #151515;
+      --text: #e8e8e8;
+      --muted: #9a9a9a;
+      --faint: #666;
+      --line: #303030;
+      --line-2: #1f1f1f;
+      --white: #f5f5f5;
+      --black: #000;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 18px;
+      font-size: 13px;
+    }
+
+    .container { max-width: 1500px; margin: 0 auto; }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -2px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filters {
+      position: sticky;
+      top: 10px;
+      z-index: 10;
+      background: rgba(16,16,16,0.96);
+      border: 1px solid var(--line);
+      padding: 10px;
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      padding: 10px;
+      font-size: 12px;
+      background: var(--black);
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      border-radius: 0;
+    }
+
+    textarea { min-height: 78px; resize: vertical; }
+    option { color: var(--text); background: var(--black); }
+    input::placeholder, textarea::placeholder { color: var(--faint); }
+    input:focus, select:focus, textarea:focus { border-color: var(--white); }
+
+    .count-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .save-status { color: var(--muted); font-size: 12px; }
+
+    .status-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .auth-btn {
+      border: 1px solid var(--white);
+      background: var(--white);
+      color: var(--black);
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+      white-space: nowrap;
+    }
+
+    .auth-btn:hover {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--white);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .card-shell {
+      perspective: 1200px;
+      min-height: 560px;
+    }
+
+    .card-flipper {
+      position: relative;
+      width: 100%;
+      min-height: 560px;
+      transform-style: preserve-3d;
+      transition: transform 0.32s ease;
+    }
+
+    .card-shell.is-editing .card-flipper { transform: rotateY(180deg); }
+
+    .card,
+    .card-back {
+      position: absolute;
+      inset: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: auto;
+    }
+
+    .card:hover, .card-back:hover {
+      border-color: var(--white);
+      background: var(--panel-2);
+    }
+
+    .card-back { transform: rotateY(180deg); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--line-2);
+      padding-bottom: 10px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h2, .card-back h2 {
+      font-size: 18px;
+      letter-spacing: -0.7px;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .icon-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--line);
+      background: var(--black);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0;
+    }
+
+    .icon-btn:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    .region {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .priority-select {
+      width: auto;
+      min-width: 92px;
+      cursor: pointer;
+      font-weight: 700;
+      padding: 7px 22px 7px 8px;
+      text-transform: uppercase;
+      font-size: 11px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+      background-position: calc(100% - 13px) 50%, calc(100% - 8px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      border-radius: 0;
+    }
+
+    .priority-user { background-color: var(--white); color: var(--black); border-color: var(--white); }
+    .priority-high { background-color: #cfcfcf; color: var(--black); border-color: #cfcfcf; }
+    .priority-medium { background-color: #303030; color: var(--text); border-color: #555; }
+    .priority-low { background-color: var(--black); color: var(--muted); border-color: var(--line); }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .tag {
+      background: var(--black);
+      border: 1px solid var(--line);
+      padding: 5px 7px;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .card p, .card-back p { color: var(--muted); font-size: 12px; }
+    .card p strong, .card-back p strong { color: var(--text); text-transform: uppercase; font-size: 11px; }
+
+    .email-display {
+      border: 1px solid var(--line);
+      background: var(--black);
+      padding: 9px;
+      min-height: 37px;
+      color: var(--text);
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .email-display.empty-email { color: var(--faint); }
+
+    .links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
+    .links a {
+      border: 1px solid var(--line);
+      background: var(--black);
+      padding: 9px 6px;
+      text-align: center;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .links a:hover { background: var(--white); color: var(--black); border-color: var(--white); }
+
+    .note-wrap, .edit-block {
+      border-top: 1px solid var(--line-2);
+      padding-top: 10px;
+    }
+
+    .note-label, .edit-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .note-label span:last-child, .edit-label span:last-child { color: var(--faint); }
+
+    .edit-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .edit-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .edit-actions button {
+      border: 1px solid var(--line);
+      background: var(--black);
+      color: var(--text);
+      padding: 10px;
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .edit-actions button:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      text-transform: uppercase;
+    }
+
+    .add-artist-btn {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 999;
+      border: 1px solid var(--white);
+      background: var(--white);
+      color: var(--black);
+      padding: 14px 16px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+      box-shadow: 8px 8px 0 var(--black), 8px 8px 0 1px var(--line);
+    }
+
+    .add-artist-btn:hover {
+      background: var(--black);
+      color: var(--white);
+      box-shadow: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal.is-open { display: flex; }
+
+    .modal-panel {
+      width: min(720px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid var(--white);
+      padding: 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: -0.6px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .form-label {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      letter-spacing: 0.4px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .modal-actions button,
+    .close-btn {
+      border: 1px solid var(--line);
+      background: var(--black);
+      color: var(--text);
+      padding: 10px;
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .modal-actions button:hover,
+    .close-btn:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .filters-grid { grid-template-columns: 1fr 1fr; }
+      .links { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 10px; }
+      .hero { padding: 14px; flex-direction: column; align-items: stretch; }
+      .hero .auth-btn { width: 100%; }
+      .grid, .stats, .filters-grid { grid-template-columns: 1fr; }
+      .count-row { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>@DRUSKHI OUTREACH DASHBOARD</h1>
+      <button class="auth-btn" id="authBtn" onclick="toggleAuth()">Sign in Google</button>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><strong id="totalStat">0</strong><span>Total</span></div>
+      <div class="stat"><strong id="userStat">0</strong><span>User</span></div>
+      <div class="stat"><strong id="highStat">0</strong><span>High</span></div>
+      <div class="stat"><strong id="usStat">0</strong><span>U.S.</span></div>
+    </section>
+
+    <section class="filters">
+      <div class="filters-grid">
+        <input id="searchInput" type="text" placeholder="SEARCH" />
+        <select id="regionFilter"><option value="All">ALL REGIONS</option></select>
+        <select id="priorityFilter">
+          <option value="All">ALL PRIORITIES</option>
+          <option value="USER">USER</option>
+          <option value="High">HIGH</option>
+          <option value="Medium">MEDIUM</option>
+          <option value="Low">LOW</option>
+        </select>
+        <select id="sortSelect">
+          <option value="auto">PRIORITY + A-Z</option>
+          <option value="name">A-Z</option>
+          <option value="region">REGION + A-Z</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="count-row">
+      <p id="resultCount">Showing 0 artists</p>
+      <div class="status-actions">
+        <p class="save-status" id="saveStatus">Autosave ready</p>
+      </div>
+    </div>
+
+    <main class="grid" id="artistGrid"></main>
+  </div>
+
+  <button class="add-artist-btn" onclick="openAddArtistModal()">+ Add Artist</button>
+
+  <div class="modal" id="addArtistModal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2>Add Artist</h2>
+        <button class="close-btn" onclick="closeAddArtistModal()">Close</button>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          <span class="form-label">Name</span>
+          <input id="newName" type="text" placeholder="ARTIST NAME" />
+        </label>
+        <label>
+          <span class="form-label">Region</span>
+          <input id="newRegion" type="text" placeholder="REGION" value="User Added" />
+        </label>
+        <label>
+          <span class="form-label">Lane</span>
+          <input id="newLane" type="text" placeholder="LANE" value="User-added artist" />
+        </label>
+        <label>
+          <span class="form-label">Priority</span>
+          <select id="newPriority">
+            <option value="USER">USER</option>
+            <option value="High">HIGH</option>
+            <option value="Medium">MEDIUM</option>
+            <option value="Low">LOW</option>
+          </select>
+        </label>
+        <label class="full">
+          <span class="form-label">Email</span>
+          <input id="newEmail" type="text" placeholder="EMAIL" />
+        </label>
+        <label class="full">
+          <span class="form-label">Instagram</span>
+          <input id="newInstagram" type="url" placeholder="INSTAGRAM URL" />
+        </label>
+        <label class="full">
+          <span class="form-label">TikTok</span>
+          <input id="newTikTok" type="url" placeholder="TIKTOK URL" />
+        </label>
+        <label class="full">
+          <span class="form-label">Spotify</span>
+          <input id="newSpotify" type="url" placeholder="SPOTIFY URL" />
+        </label>
+        <label class="full">
+          <span class="form-label">YouTube</span>
+          <input id="newYouTube" type="url" placeholder="YOUTUBE URL" />
+        </label>
+        <label class="full">
+          <span class="form-label">Fit</span>
+          <input id="newFit" type="text" placeholder="FIT" value="Added by user. Verify fit, current activity, and best contact route." />
+        </label>
+        <label class="full">
+          <span class="form-label">Pitch</span>
+          <input id="newPitch" type="text" placeholder="PITCH" value="Use a short message and lead with why the song fits their sound." />
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="addArtistFromModal()">Add Artist</button>
+        <button onclick="clearAddArtistForm()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4mAggiPorQdcnMrvox8t6ZNxF7o1C98o",
+      authDomain: "druskhi-outreach-dashboard.firebaseapp.com",
+      projectId: "druskhi-outreach-dashboard",
+      storageBucket: "druskhi-outreach-dashboard.firebasestorage.app",
+      messagingSenderId: "375387055106",
+      appId: "1:375387055106:web:68ab3ab1f9bd796f85b31b"
+    };
+
+    const FIREBASE_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
+    let firebaseApp = null;
+    let firebaseAuth = null;
+    let firebaseProvider = null;
+    let firebaseDb = null;
+    let firebaseUid = null;
+    let firebaseDocRef = null;
+    let firebaseOnline = false;
+
+    const STORAGE_KEY = "artistOutreachDashboard.v4";
+    const CUSTOM_ARTISTS_KEY = "artistOutreachDashboard.customArtists.v1";
+    const OLD_STORAGE_KEY = "artistOutreachDashboard.v2";
+    const priorityOrder = { USER: 4, High: 3, Medium: 2, Low: 1 };
+    const editingCards = new Set();
+
+    const baseArtists = [
+      { name: "Alyssa Sinacori", region: "User Added", lane: "User-added artist", priority: "USER", fit: "Added by user. Verify fit, current activity, and best contact route.", pitch: "Check recent posts and decide whether to pitch the reference directly or build rapport first.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/alyssa_sinacori/", tiktok: "https://www.tiktok.com/search?q=Alyssa%20Sinacori", spotify: "https://open.spotify.com/search/Alyssa%20Sinacori", youtube: "https://www.youtube.com/results?search_query=Alyssa+Sinacori" } },
+      { name: "M Huncho", region: "User Added", lane: "Melodic rap / trap", priority: "USER", fit: "Added by user. Strong melodic/rap lane if the record has a dark, polished, international feel.", pitch: "Pitch the full song direction and melody, not just the beat.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/mhuncho/", tiktok: "https://www.tiktok.com/search?q=M%20Huncho", spotify: "https://open.spotify.com/search/M%20Huncho", youtube: "https://www.youtube.com/results?search_query=M+Huncho" } },
+      { name: "J King", region: "User Added", lane: "User-added artist", priority: "USER", fit: "Added by user. Verify lane and recent activity before outreach.", pitch: "Use a short message and lead with why the song fits their sound.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/jking.music/", tiktok: "https://www.tiktok.com/search?q=J%20King%20music", spotify: "https://open.spotify.com/search/J%20King", youtube: "https://www.youtube.com/results?search_query=J+King+music" } },
+      { name: "Fredo", region: "User Added", lane: "UK rap / street rap", priority: "USER", fit: "Added by user. Better if the song can lean darker, cleaner, or more street-luxury.", pitch: "Approach professionally; likely better through management or a warm route.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/fredo/", tiktok: "https://www.tiktok.com/search?q=Fredo%20rapper", spotify: "https://open.spotify.com/search/Fredo", youtube: "https://www.youtube.com/results?search_query=Fredo+rapper" } },
+
+      { name: "Youngn Lipz", region: "Australia", lane: "Melodic rap / R&B", priority: "High", fit: "Very close Day1-adjacent fit. Strong for melodic, relationship-driven records with a clean hook.", pitch: "Lead with the melody and reference direction. Keep it polished and emotional.", size: "Mid-tier / Day1-adjacent", email: "", socials: { instagram: "https://www.instagram.com/youngnlipz/", tiktok: "https://www.tiktok.com/search?q=Youngn%20Lipz", spotify: "https://open.spotify.com/search/Youngn%20Lipz", youtube: "https://www.youtube.com/results?search_query=Youngn+Lipz" } },
+      { name: "Hooligan Hefs", region: "Australia", lane: "Aus rap / street rap", priority: "Medium", fit: "Bigger than Day1 but directly in the same ecosystem. Better through management or warm intro.", pitch: "Pitch it as a real record, not just a beat. Emphasize hook and final-song potential.", size: "Upper mid-tier", email: "", socials: { instagram: "https://www.instagram.com/hooliganhefs/", tiktok: "https://www.tiktok.com/search?q=Hooligan%20Hefs", spotify: "https://open.spotify.com/search/Hooligan%20Hefs", youtube: "https://www.youtube.com/results?search_query=Hooligan+Hefs" } },
+      { name: "Lisi", region: "Australia / Pacific", lane: "Storytelling / melodic street rap", priority: "High", fit: "Strong if the song has pain, storytelling, or a big emotional hook.", pitch: "Emphasize the emotion and chorus. Let him know he can make it his own vocally.", size: "Mid-tier / Day1-adjacent", email: "", socials: { instagram: "https://www.instagram.com/lisi4300/", tiktok: "https://www.tiktok.com/search?q=Lisi%20rapper", spotify: "https://open.spotify.com/search/Lisi", youtube: "https://www.youtube.com/results?search_query=Lisi+rapper" } },
+      { name: "The 046", region: "Australia", lane: "Group anthem / Aus funk / rap", priority: "Medium", fit: "Good if the record can become a group anthem or multiple-voice moment.", pitch: "Frame it as a hook-driven anthem they could flip with group energy.", size: "Mid-tier / active scene act", email: "", socials: { instagram: "https://www.instagram.com/the_046_official", tiktok: "https://www.tiktok.com/search?q=The%20046", spotify: "https://open.spotify.com/search/The%20046", youtube: "https://www.youtube.com/results?search_query=The+046" } },
+      { name: "Ay Huncho", region: "Australia", lane: "Melodic street rap / R&B", priority: "High", fit: "Close Day1 lane. Strong for dark melodic pockets or street-love records.", pitch: "Pitch the bounce, melody, and emotional tone. Keep the message direct.", size: "Mid-tier / Day1-adjacent", email: "", socials: { instagram: "https://www.instagram.com/ayhuncho/", tiktok: "https://www.tiktok.com/search?q=Ay%20Huncho", spotify: "https://open.spotify.com/search/Ay%20Huncho", youtube: "https://www.youtube.com/results?search_query=Ay+Huncho" } },
+      { name: "Stallyano", region: "New Zealand", lane: "Melodic rap", priority: "High", fit: "Reachable target for emotional, melodic, street-R&B leaning records.", pitch: "Lead with melody/cadence and make it feel like a complete song idea.", size: "Mid-tier / reachable", email: "", socials: { instagram: "https://www.instagram.com/stallyano/", tiktok: "https://www.tiktok.com/search?q=Stallyano", spotify: "https://open.spotify.com/search/Stallyano", youtube: "https://www.youtube.com/results?search_query=Stallyano" } },
+      { name: "Sydney Yungins", region: "Australia", lane: "Group rap / drill / party wave", priority: "Medium", fit: "Good if the record can be adapted into a group song or party-facing hook.", pitch: "Frame the song as flexible and easy for multiple voices to jump on.", size: "Lower-mid / scene act", email: "", socials: { instagram: "https://www.instagram.com/sydneyyungins/", tiktok: "https://www.tiktok.com/search?q=Sydney%20Yungins", spotify: "https://open.spotify.com/search/Sydney%20Yungins", youtube: "https://www.youtube.com/results?search_query=Sydney+Yungins" } },
+      { name: "Oliver Cronin", region: "Australia", lane: "Pop-R&B / crossover", priority: "Medium", fit: "Good if the song has a big clean hook and crossover potential.", pitch: "Send the most polished private bounce. Emphasize the song, not the beat.", size: "Upper mid-tier / social-facing", email: "", socials: { instagram: "https://www.instagram.com/olivercronin/", tiktok: "https://www.tiktok.com/search?q=Oliver%20Cronin", spotify: "https://open.spotify.com/search/Oliver%20Cronin", youtube: "https://www.youtube.com/results?search_query=Oliver+Cronin" } },
+
+      { name: "Yatta Bandz", region: "United States", lane: "Melodic pain rap", priority: "High", fit: "One of the strongest U.S. fits for emotional melody, heartbreak, and hook-driven records.", pitch: "Lead with the hook and emotional angle. Keep the message short and serious.", size: "Mid-tier / strong fanbase", email: "", socials: { instagram: "https://www.instagram.com/yattabandz/", tiktok: "https://www.tiktok.com/search?q=Yatta%20Bandz", spotify: "https://open.spotify.com/search/Yatta%20Bandz", youtube: "https://www.youtube.com/results?search_query=Yatta+Bandz" } },
+      { name: "MBNel", region: "United States", lane: "West Coast melodic street rap", priority: "High", fit: "Great for heartfelt, street, reflective, or hook-driven songs.", pitch: "Make the record feel personal and honest. Reference + lyrics matter here.", size: "Mid-tier / Day1-caliber", email: "", socials: { instagram: "https://www.instagram.com/nellynelmb/", tiktok: "https://www.tiktok.com/search?q=MBNel", spotify: "https://open.spotify.com/search/MBNel", youtube: "https://www.youtube.com/results?search_query=MBNel" } },
+      { name: "2KBABY", region: "United States", lane: "Melodic trap / pain rap", priority: "High", fit: "Strong fit for a catchy emotional hook with vocal room and commercial potential.", pitch: "Pitch it as a complete song idea and highlight the chorus immediately.", size: "Upper mid-tier", email: "", socials: { instagram: "https://www.instagram.com/2kbaby/", tiktok: "https://www.tiktok.com/search?q=2KBABY", spotify: "https://open.spotify.com/search/2KBABY", youtube: "https://www.youtube.com/results?search_query=2KBABY" } },
+      { name: "Lil Kee", region: "United States", lane: "Atlanta melodic pain rap", priority: "High", fit: "Good for emotional piano/guitar beats, street-love themes, and NoCap/Rylo-adjacent fans.", pitch: "Use a concise message and make the private link easy to open.", size: "Mid-tier / reachable", email: "", socials: { instagram: "https://www.instagram.com/1lilkee/", tiktok: "https://www.tiktok.com/search?q=Lil%20Kee", spotify: "https://open.spotify.com/search/Lil%20Kee", youtube: "https://www.youtube.com/results?search_query=Lil+Kee" } },
+      { name: "FCG Heem", region: "United States", lane: "Florida melodic street rap", priority: "High", fit: "Great if the record has emotion but still carries bounce and street energy.", pitch: "Pitch it as something he can put his pain into while keeping the bounce.", size: "Mid-tier / active", email: "", socials: { instagram: "https://www.instagram.com/fcgheem/", tiktok: "https://www.tiktok.com/search?q=FCG%20Heem", spotify: "https://open.spotify.com/search/FCG%20Heem", youtube: "https://www.youtube.com/results?search_query=FCG+Heem" } },
+      { name: "Big Sad 1900", region: "United States", lane: "West Coast street rap / pain rap", priority: "Medium", fit: "Strong if the record is gritty, reflective, and real-life focused.", pitch: "Use a darker, more direct pitch. Less pop, more pain and authenticity.", size: "Mid-tier / strong traction", email: "", socials: { instagram: "https://www.instagram.com/bigx1900/?hl=en", tiktok: "https://www.tiktok.com/search?q=Big%20Sad%201900", spotify: "https://open.spotify.com/search/Big%20Sad%201900", youtube: "https://www.youtube.com/results?search_query=Big+Sad+1900" } },
+      { name: "Noodah05", region: "United States", lane: "Atlanta melodic street rap", priority: "Medium", fit: "Good if the hook is emotional and the beat has ATL bounce.", pitch: "Keep the pitch direct. Make the record feel ready to cut, not experimental.", size: "Mid-tier / active", email: "", socials: { instagram: "https://www.instagram.com/noodah05/", tiktok: "https://www.tiktok.com/search?q=Noodah05", spotify: "https://open.spotify.com/search/Noodah05", youtube: "https://www.youtube.com/results?search_query=Noodah05" } },
+      { name: "Wizz Havinn", region: "United States", lane: "Florida rap / slick street flow", priority: "Medium", fit: "Good for bouncy, darker, or slicker records. Less ideal for a pure love-song demo.", pitch: "Only send if the drums and flow pocket are strong enough for Florida motion.", size: "Mid-tier / active", email: "", socials: { instagram: "https://www.instagram.com/wizzhavinnn/", tiktok: "https://www.tiktok.com/search?q=Wizz%20Havinn", spotify: "https://open.spotify.com/search/Wizz%20Havinn", youtube: "https://www.youtube.com/results?search_query=Wizz+Havinn" } },
+      { name: "El Snappo", region: "United States", lane: "Florida street rap / trap", priority: "Medium", fit: "Good if the record can be flipped cockier, punchier, or more street.", pitch: "Send only if the beat hits hard and the hook can survive a grittier delivery.", size: "Mid-tier / active", email: "", socials: { instagram: "https://www.instagram.com/el.snappo/", tiktok: "https://www.tiktok.com/search?q=El%20Snappo", spotify: "https://open.spotify.com/search/El%20Snappo", youtube: "https://www.youtube.com/results?search_query=El+Snappo" } }
+    ];
+
+    let state = loadState();
+    let customArtists = loadCustomArtists();
+    let artists = mergeSavedState([...baseArtists, ...customArtists], state);
+
+    const grid = document.getElementById("artistGrid");
+    const searchInput = document.getElementById("searchInput");
+    const regionFilter = document.getElementById("regionFilter");
+    const priorityFilter = document.getElementById("priorityFilter");
+    const sortSelect = document.getElementById("sortSelect");
+    const resultCount = document.getElementById("resultCount");
+    const saveStatus = document.getElementById("saveStatus");
+
+    function slug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
+    function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }
+
+    function loadState() {
+      try {
+        const current = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (current) return current;
+        return JSON.parse(localStorage.getItem(OLD_STORAGE_KEY)) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function loadCustomArtists() {
+      try {
+        return JSON.parse(localStorage.getItem(CUSTOM_ARTISTS_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCustomArtists() {
+      localStorage.setItem(CUSTOM_ARTISTS_KEY, JSON.stringify(customArtists));
+    }
+
+    async function initFirebaseCloud() {
+      if (!FIREBASE_ENABLED) {
+        saveStatus.textContent = "Firebase config missing / local mode";
+        return;
+      }
+
+      try {
+        firebaseApp = initializeApp(firebaseConfig);
+        firebaseAuth = getAuth(firebaseApp);
+        firebaseProvider = new GoogleAuthProvider();
+        firebaseDb = getFirestore(firebaseApp);
+
+        onAuthStateChanged(firebaseAuth, async user => {
+          if (!user) {
+            firebaseUid = null;
+            firebaseDocRef = null;
+            firebaseOnline = false;
+            document.getElementById("authBtn").textContent = "Sign in Google";
+            saveStatus.textContent = "Local mode";
+            return;
+          }
+
+          firebaseUid = user.uid;
+          firebaseDocRef = doc(firebaseDb, "users", firebaseUid, "dashboards", "druskhi-outreach");
+          firebaseOnline = true;
+          document.getElementById("authBtn").textContent = "Sign out";
+
+          await loadCloudDashboard();
+        });
+      } catch (error) {
+        console.error("Firebase init failed", error);
+        firebaseOnline = false;
+        saveStatus.textContent = "Firebase offline / local mode";
+      }
+    }
+
+    async function loadCloudDashboard() {
+      if (!firebaseDocRef) return;
+
+      try {
+        const snap = await getDoc(firebaseDocRef);
+        if (snap.exists()) {
+          const cloud = snap.data();
+          const cloudState = cloud.state || {};
+          const cloudCustomArtists = Array.isArray(cloud.customArtists) ? cloud.customArtists : [];
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudState));
+          localStorage.setItem(CUSTOM_ARTISTS_KEY, JSON.stringify(cloudCustomArtists));
+
+          state = cloudState;
+          customArtists = cloudCustomArtists;
+          artists = mergeSavedState([...baseArtists, ...customArtists], state);
+          populateRegions();
+          renderArtists();
+          saveStatus.textContent = "Cloud loaded";
+        } else {
+          await saveState();
+          saveStatus.textContent = "Cloud initialized";
+        }
+      } catch (error) {
+        console.error("Cloud load failed", error);
+        saveStatus.textContent = "Cloud load failed / local mode";
+      }
+    }
+
+    async function toggleAuth() {
+      if (!FIREBASE_ENABLED || !firebaseAuth || !firebaseProvider) {
+        alert("Paste your Firebase config first.");
+        return;
+      }
+
+      try {
+        if (firebaseAuth.currentUser) {
+          await signOut(firebaseAuth);
+        } else {
+          await signInWithPopup(firebaseAuth, firebaseProvider);
+        }
+      } catch (error) {
+        console.error("Auth failed", error);
+        alert("Firebase sign-in failed. Check your Firebase config and enabled providers.");
+      }
+    }
+
+    function buildStatePayload() {
+      const payload = {};
+      artists.forEach(artist => {
+        payload[artist.id] = {
+          priority: artist.priority,
+          note: artist.note || "",
+          email: artist.email || "",
+          socials: artist.socials || {}
+        };
+      });
+      return payload;
+    }
+
+    async function saveState() {
+      const payload = buildStatePayload();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      saveStatus.textContent = "Saved local " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+
+      if (!firebaseOnline || !firebaseDocRef) return;
+
+      try {
+        await setDoc(firebaseDocRef, {
+          state: payload,
+          customArtists,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        saveStatus.textContent = "Saved cloud " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+      } catch (error) {
+        console.error("Firebase save failed", error);
+        saveStatus.textContent = "Cloud save failed / local saved";
+      }
+    }
+
+    function mergeSavedState(list, saved) {
+      return list.map(artist => {
+        const id = slug(artist.name);
+        const existing = saved[id] || {};
+        return {
+          ...artist,
+          id,
+          priority: existing.priority || artist.priority,
+          note: existing.note || "",
+          email: existing.email || artist.email || "",
+          socials: { ...artist.socials, ...(existing.socials || {}) }
+        };
+      });
+    }
+
+    function populateRegions() {
+      const regions = Array.from(new Set(artists.map(a => a.region))).sort();
+      regionFilter.innerHTML = '<option value="All">ALL REGIONS</option>' + regions.map(region => `<option value="${escapeHtml(region)}">${escapeHtml(region).toUpperCase()}</option>`).join("");
+    }
+
+    function sortArtists(list) {
+      const mode = sortSelect.value;
+      const copy = [...list];
+      if (mode === "name") return copy.sort((a, b) => a.name.localeCompare(b.name));
+      if (mode === "region") return copy.sort((a, b) => a.region.localeCompare(b.region) || a.name.localeCompare(b.name));
+      return copy.sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0) || a.name.localeCompare(b.name));
+    }
+
+    function getFilteredArtists() {
+      const query = searchInput.value.toLowerCase().trim();
+      const region = regionFilter.value;
+      const priority = priorityFilter.value;
+
+      return artists.filter(artist => {
+        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.fit} ${artist.pitch} ${artist.size} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
+        return (!query || text.includes(query)) && (region === "All" || artist.region === region) && (priority === "All" || artist.priority === priority);
+      });
+    }
+
+    function renderArtists() {
+      const filtered = sortArtists(getFilteredArtists());
+      resultCount.textContent = `Showing ${filtered.length} of ${artists.length} artists`;
+      updateStats();
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="empty">No artists match your filters.</div>';
+        return;
+      }
+      grid.innerHTML = filtered.map(artistCardHTML).join("");
+      editingCards.forEach(id => {
+        const shell = document.querySelector(`[data-id="${id}"]`);
+        if (shell) shell.classList.add("is-editing");
+      });
+    }
+
+    function artistCardHTML(artist) {
+      const cls = `priority-${artist.priority.toLowerCase()}`;
+      const emailText = artist.email ? escapeHtml(artist.email) : "NO EMAIL";
+      const emailClass = artist.email ? "email-display" : "email-display empty-email";
+      return `
+        <section class="card-shell" data-id="${artist.id}">
+          <div class="card-flipper">
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <div class="title-row">
+                    <h2>${escapeHtml(artist.name)}</h2>
+                    <button class="icon-btn" title="Edit socials/email" onclick="flipCard('${artist.id}', true)">✎</button>
+                  </div>
+                  <div class="region">${escapeHtml(artist.region)}</div>
+                </div>
+                <select class="priority-select ${cls}" onchange="changePriority('${artist.id}', this.value)">
+                  ${["USER", "High", "Medium", "Low"].map(p => `<option value="${p}" ${artist.priority === p ? "selected" : ""}>${p}</option>`).join("")}
+                </select>
+              </div>
+
+              <div class="tags">
+                <span class="tag">${escapeHtml(artist.lane)}</span>
+                <span class="tag">${escapeHtml(artist.size)}</span>
+              </div>
+
+              <p><strong>Fit:</strong> ${escapeHtml(artist.fit)}</p>
+              <p><strong>Pitch:</strong> ${escapeHtml(artist.pitch)}</p>
+
+              <div>
+                <div class="note-label"><span>Email</span><span>edit via pencil</span></div>
+                <div class="${emailClass}">${emailText}</div>
+              </div>
+
+              <div class="links">
+                <a href="${artist.socials.instagram}" target="_blank" rel="noreferrer">Instagram</a>
+                <a href="${artist.socials.tiktok}" target="_blank" rel="noreferrer">TikTok</a>
+                <a href="${artist.socials.spotify}" target="_blank" rel="noreferrer">Spotify</a>
+                <a href="${artist.socials.youtube}" target="_blank" rel="noreferrer">YouTube</a>
+              </div>
+
+              <div class="note-wrap">
+                <div class="note-label"><span>Notes</span><span>Autosaved</span></div>
+                <textarea placeholder="NOTES" oninput="changeNote('${artist.id}', this.value)">${escapeHtml(artist.note || "")}</textarea>
+              </div>
+            </article>
+
+            <article class="card-back">
+              <div class="card-header">
+                <div>
+                  <div class="title-row">
+                    <h2>${escapeHtml(artist.name)}</h2>
+                    <button class="icon-btn" title="Back" onclick="flipCard('${artist.id}', false)">↩</button>
+                  </div>
+                  <div class="region">EDIT SOCIALS + EMAIL</div>
+                </div>
+              </div>
+
+              <div class="edit-grid">
+                <div class="edit-block">
+                  <div class="edit-label"><span>Email</span><span>Autosaved</span></div>
+                  <input type="text" value="${escapeHtml(artist.email || "")}" placeholder="EMAIL" oninput="changeEditableField('${artist.id}', 'email', this.value)" />
+                </div>
+
+                <div class="edit-block">
+                  <div class="edit-label"><span>Instagram</span><span>Autosaved</span></div>
+                  <input type="url" value="${escapeHtml(artist.socials.instagram || "")}" placeholder="INSTAGRAM URL" oninput="changeSocial('${artist.id}', 'instagram', this.value)" />
+                </div>
+
+                <div class="edit-block">
+                  <div class="edit-label"><span>TikTok</span><span>Autosaved</span></div>
+                  <input type="url" value="${escapeHtml(artist.socials.tiktok || "")}" placeholder="TIKTOK URL" oninput="changeSocial('${artist.id}', 'tiktok', this.value)" />
+                </div>
+
+                <div class="edit-block">
+                  <div class="edit-label"><span>Spotify</span><span>Autosaved</span></div>
+                  <input type="url" value="${escapeHtml(artist.socials.spotify || "")}" placeholder="SPOTIFY URL" oninput="changeSocial('${artist.id}', 'spotify', this.value)" />
+                </div>
+
+                <div class="edit-block">
+                  <div class="edit-label"><span>YouTube</span><span>Autosaved</span></div>
+                  <input type="url" value="${escapeHtml(artist.socials.youtube || "")}" placeholder="YOUTUBE URL" oninput="changeSocial('${artist.id}', 'youtube', this.value)" />
+                </div>
+              </div>
+
+              <div class="edit-actions">
+                <button onclick="flipCard('${artist.id}', false)">Done</button>
+                <button onclick="openAllLinks('${artist.id}')">Open Links</button>
+              </div>
+            </article>
+          </div>
+        </section>
+      `;
+    }
+
+    function flipCard(id, editing) {
+      const shell = document.querySelector(`[data-id="${id}"]`);
+      if (!shell) return;
+      if (editing) {
+        editingCards.add(id);
+        shell.classList.add("is-editing");
+      } else {
+        editingCards.delete(id);
+        shell.classList.remove("is-editing");
+        renderArtists();
+      }
+    }
+
+    function changePriority(id, value) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+      artist.priority = value;
+      saveState();
+      renderArtists();
+    }
+
+    let saveTimer;
+    function scheduleSave() {
+      saveStatus.textContent = "Saving...";
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        await saveState();
+        updateStats();
+      }, 420);
+    }
+
+    function changeNote(id, value) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+      artist.note = value;
+      scheduleSave();
+    }
+
+    function changeEditableField(id, field, value) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+      artist[field] = value;
+      scheduleSave();
+    }
+
+    function changeSocial(id, field, value) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+      artist.socials[field] = value;
+      scheduleSave();
+    }
+
+    function openAllLinks(id) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+      Object.values(artist.socials || {}).filter(Boolean).forEach(url => window.open(url, "_blank"));
+    }
+
+    function updateStats() {
+      document.getElementById("totalStat").textContent = artists.length;
+      document.getElementById("userStat").textContent = artists.filter(a => a.priority === "USER").length;
+      document.getElementById("highStat").textContent = artists.filter(a => a.priority === "High").length;
+      document.getElementById("usStat").textContent = artists.filter(a => a.region === "United States").length;
+    }
+
+    function openAddArtistModal() {
+      document.getElementById("addArtistModal").classList.add("is-open");
+      setTimeout(() => document.getElementById("newName").focus(), 0);
+    }
+
+    function closeAddArtistModal() {
+      document.getElementById("addArtistModal").classList.remove("is-open");
+    }
+
+    function clearAddArtistForm() {
+      document.getElementById("newName").value = "";
+      document.getElementById("newRegion").value = "User Added";
+      document.getElementById("newLane").value = "User-added artist";
+      document.getElementById("newPriority").value = "USER";
+      document.getElementById("newEmail").value = "";
+      document.getElementById("newInstagram").value = "";
+      document.getElementById("newTikTok").value = "";
+      document.getElementById("newSpotify").value = "";
+      document.getElementById("newYouTube").value = "";
+      document.getElementById("newFit").value = "Added by user. Verify fit, current activity, and best contact route.";
+      document.getElementById("newPitch").value = "Use a short message and lead with why the song fits their sound.";
+    }
+
+    function addArtistFromModal() {
+      const name = document.getElementById("newName").value.trim();
+      if (!name) {
+        alert("Artist name required.");
+        return;
+      }
+
+      const id = slug(name);
+      if (artists.some(a => a.id === id)) {
+        alert("Artist already exists.");
+        return;
+      }
+
+      const artist = {
+        name,
+        region: document.getElementById("newRegion").value.trim() || "User Added",
+        lane: document.getElementById("newLane").value.trim() || "User-added artist",
+        priority: document.getElementById("newPriority").value || "USER",
+        fit: document.getElementById("newFit").value.trim() || "Added by user. Verify fit, current activity, and best contact route.",
+        pitch: document.getElementById("newPitch").value.trim() || "Use a short message and lead with why the song fits their sound.",
+        size: "User target",
+        email: document.getElementById("newEmail").value.trim(),
+        note: "",
+        socials: {
+          instagram: document.getElementById("newInstagram").value.trim() || `https://www.instagram.com/`,
+          tiktok: document.getElementById("newTikTok").value.trim() || `https://www.tiktok.com/search?q=${encodeURIComponent(name)}`,
+          spotify: document.getElementById("newSpotify").value.trim() || `https://open.spotify.com/search/${encodeURIComponent(name)}`,
+          youtube: document.getElementById("newYouTube").value.trim() || `https://www.youtube.com/results?search_query=${encodeURIComponent(name)}`
+        }
+      };
+
+      customArtists.push(artist);
+      saveCustomArtists();
+      artists.push({ ...artist, id });
+      populateRegions();
+      saveState();
+      clearAddArtistForm();
+      closeAddArtistModal();
+      renderArtists();
+    }
+
+    document.getElementById("addArtistModal").addEventListener("click", function(event) {
+      if (event.target.id === "addArtistModal") closeAddArtistModal();
+    });
+
+    searchInput.addEventListener("input", renderArtists);
+    regionFilter.addEventListener("change", renderArtists);
+    priorityFilter.addEventListener("change", renderArtists);
+    sortSelect.addEventListener("change", renderArtists);
+
+    window.openAddArtistModal = openAddArtistModal;
+    window.closeAddArtistModal = closeAddArtistModal;
+    window.clearAddArtistForm = clearAddArtistForm;
+    window.addArtistFromModal = addArtistFromModal;
+    window.flipCard = flipCard;
+    window.changePriority = changePriority;
+    window.changeNote = changeNote;
+    window.changeEditableField = changeEditableField;
+    window.changeSocial = changeSocial;
+    window.openAllLinks = openAllLinks;
+    window.toggleAuth = toggleAuth;
+
+    async function initApp() {
+      populateRegions();
+      renderArtists();
+      await initFirebaseCloud();
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
