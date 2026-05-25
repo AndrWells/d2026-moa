@@ -830,6 +830,8 @@
     const THEME_KEY = "artistOutreachDashboard.theme.v1";
     const CUSTOM_ARTISTS_KEY = "artistOutreachDashboard.customArtists.v1";
     const DELETED_ARTISTS_KEY = "artistOutreachDashboard.deletedArtists.v1";
+    const ARTISTS_CACHE_KEY = "artistOutreachDashboard.sharedArtists.v1";
+    const SYNC_INTERVAL_MS = 60000;
     const OLD_STORAGE_KEY = "artistOutreachDashboard.v2";
     const priorityOrder = { USER: 4, High: 3, Medium: 2, Low: 1 };
     const editingCards = new Set();
@@ -863,7 +865,10 @@
     let state = loadState();
     let customArtists = loadCustomArtists();
     let deletedArtistIds = loadDeletedArtists();
-    let artists = mergeSavedState([...baseArtists, ...customArtists], state).filter(artist => !deletedArtistIds.includes(artist.id));
+    let artists = loadLocalArtists();
+    if (!artists.length) {
+      artists = mergeSavedState([...baseArtists, ...customArtists], state).filter(artist => !deletedArtistIds.includes(artist.id));
+    }
 
     const grid = document.getElementById("artistGrid");
     const searchInput = document.getElementById("searchInput");
@@ -944,6 +949,47 @@
       localStorage.setItem(DELETED_ARTISTS_KEY, JSON.stringify(deletedArtistIds));
     }
 
+    function normalizeArtist(artist) {
+      const id = artist.id || slug(artist.name || "artist");
+      return {
+        name: artist.name || "Untitled Artist",
+        id,
+        region: artist.region || "User Added",
+        lane: artist.lane || "User-added artist",
+        priority: artist.priority || "USER",
+        fit: artist.fit || "",
+        pitch: artist.pitch || "",
+        size: artist.size || "User target",
+        email: artist.email || "",
+        note: artist.note || "",
+        customTags: Array.isArray(artist.customTags) ? artist.customTags : [],
+        socials: {
+          instagram: artist.socials?.instagram || "https://www.instagram.com/",
+          tiktok: artist.socials?.tiktok || `https://www.tiktok.com/search?q=${encodeURIComponent(artist.name || "")}`,
+          spotify: artist.socials?.spotify || `https://open.spotify.com/search/${encodeURIComponent(artist.name || "")}`,
+          youtube: artist.socials?.youtube || `https://www.youtube.com/results?search_query=${encodeURIComponent(artist.name || "")}`
+        }
+      };
+    }
+
+    function dedupeArtists(list) {
+      const map = new Map();
+      list.map(normalizeArtist).forEach(artist => map.set(artist.id, artist));
+      return Array.from(map.values());
+    }
+
+    function loadLocalArtists() {
+      try {
+        return dedupeArtists(JSON.parse(localStorage.getItem(ARTISTS_CACHE_KEY)) || []);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveLocalArtists() {
+      localStorage.setItem(ARTISTS_CACHE_KEY, JSON.stringify(artists.map(normalizeArtist)));
+    }
+
     function saveCustomArtists() {
       localStorage.setItem(CUSTOM_ARTISTS_KEY, JSON.stringify(customArtists));
     }
@@ -985,7 +1031,7 @@
           }
 
           firebaseUid = user.uid;
-          firebaseDocRef = doc(firebaseDb, "users", firebaseUid, "dashboards", "druskhi-outreach");
+          firebaseDocRef = doc(firebaseDb, "dashboards", "druskhi-outreach");
           firebaseOnline = true;
           setSignedInUi(true);
 
@@ -1005,23 +1051,27 @@
         const snap = await getDoc(firebaseDocRef);
         if (snap.exists()) {
           const cloud = snap.data();
-          const cloudState = cloud.state || {};
-          const cloudCustomArtists = Array.isArray(cloud.customArtists) ? cloud.customArtists : [];
 
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudState));
-          localStorage.setItem(CUSTOM_ARTISTS_KEY, JSON.stringify(cloudCustomArtists));
+          if (Array.isArray(cloud.artists)) {
+            const localUnsyncedArtists = loadLocalArtists();
+            artists = dedupeArtists([...cloud.artists, ...localUnsyncedArtists]);
+          } else {
+            const cloudState = cloud.state || {};
+            const cloudCustomArtists = Array.isArray(cloud.customArtists) ? cloud.customArtists : [];
+            const cloudDeletedArtistIds = Array.isArray(cloud.deletedArtistIds) ? cloud.deletedArtistIds : loadDeletedArtists();
+            artists = mergeSavedState([...baseArtists, ...cloudCustomArtists], cloudState).filter(artist => !cloudDeletedArtistIds.includes(artist.id));
+          }
 
-          state = cloudState;
-          customArtists = cloudCustomArtists;
-          deletedArtistIds = Array.isArray(cloud.deletedArtistIds) ? cloud.deletedArtistIds : loadDeletedArtists();
-          localStorage.setItem(DELETED_ARTISTS_KEY, JSON.stringify(deletedArtistIds));
-          artists = mergeSavedState([...baseArtists, ...customArtists], state).filter(artist => !deletedArtistIds.includes(artist.id));
+          saveLocalArtists();
           populateRegions();
           renderArtists();
+          await saveState();
           saveStatus.textContent = "Cloud loaded";
         } else {
+          artists = dedupeArtists(artists.length ? artists : baseArtists);
+          saveLocalArtists();
           await saveState();
-          saveStatus.textContent = "Cloud initialized";
+          saveStatus.textContent = "Shared cloud initialized";
         }
       } catch (error) {
         console.error("Cloud load failed", error);
@@ -1062,20 +1112,23 @@
     }
 
     async function saveState() {
+      artists = dedupeArtists(artists);
       const payload = buildStatePayload();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      saveLocalArtists();
       saveStatus.textContent = "Saved local " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
 
       if (!firebaseOnline || !firebaseDocRef) return;
 
       try {
         await setDoc(firebaseDocRef, {
+          artists: artists.map(normalizeArtist),
           state: payload,
-          customArtists,
+          customArtists: artists.filter(artist => !baseArtists.some(baseArtist => slug(baseArtist.name) === artist.id)).map(normalizeArtist),
           deletedArtistIds,
           updatedAt: serverTimestamp()
         }, { merge: true });
-        saveStatus.textContent = "Saved cloud " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+        saveStatus.textContent = "Saved shared cloud " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
       } catch (error) {
         console.error("Firebase save failed", error);
         saveStatus.textContent = "Cloud save failed / local saved";
@@ -1337,6 +1390,7 @@
 
       saveDeletedArtists();
       saveCustomArtists();
+      saveLocalArtists();
       populateRegions();
       await saveState();
       renderArtists();
@@ -1406,7 +1460,7 @@
       artist.customTags = [];
       customArtists.push(artist);
       saveCustomArtists();
-      artists.push({ ...artist, id });
+      artists.push(normalizeArtist({ ...artist, id }));
       populateRegions();
       saveState();
       clearAddArtistForm();
@@ -1440,6 +1494,14 @@
     window.showSettingsPage = showSettingsPage;
     window.showDashboardPage = showDashboardPage;
 
+    function startPeriodicCloudSync() {
+      setInterval(() => {
+        if (firebaseOnline && firebaseDocRef) {
+          saveState();
+        }
+      }, SYNC_INTERVAL_MS);
+    }
+
     async function initApp() {
       applyThemePreference(loadThemePreference());
       if (window.matchMedia) {
@@ -1449,6 +1511,7 @@
       }
       setSignedInUi(false, "Checking sign-in...");
       await initFirebaseCloud();
+      startPeriodicCloudSync();
     }
 
     initApp();
