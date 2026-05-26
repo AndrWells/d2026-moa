@@ -21,6 +21,11 @@
       --black: #000;
       --danger: #b00020;
       --danger-border: #ff3b3b;
+      --code-red: #c84b4b;
+      --code-gold: #c89b3c;
+      --code-green: #3aa66a;
+      --code-blue: #4c7fd1;
+      --code-purple: #8a5bd1;
     }
 
     body.theme-light {
@@ -137,7 +142,7 @@
 
     .filters-grid {
       display: grid;
-      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
       gap: 8px;
     }
 
@@ -305,7 +310,7 @@
     .card-back {
       position: absolute;
       inset: 0;
-      background: var(--panel);
+      background: linear-gradient(135deg, var(--card-tint, transparent), transparent 58%), var(--panel);
       border: 1px solid var(--line);
       padding: 14px;
       padding-bottom: 62px;
@@ -320,8 +325,14 @@
 
     .card:hover, .card-back:hover {
       border-color: var(--white);
-      background: var(--panel-2);
+      background: linear-gradient(135deg, var(--card-tint-hover, var(--card-tint, transparent)), transparent 58%), var(--panel-2);
     }
+
+    .card.color-red, .card-back.color-red { --card-tint: rgba(200, 75, 75, 0.18); --card-tint-hover: rgba(200, 75, 75, 0.24); }
+    .card.color-gold, .card-back.color-gold { --card-tint: rgba(200, 155, 60, 0.16); --card-tint-hover: rgba(200, 155, 60, 0.23); }
+    .card.color-green, .card-back.color-green { --card-tint: rgba(58, 166, 106, 0.16); --card-tint-hover: rgba(58, 166, 106, 0.23); }
+    .card.color-blue, .card-back.color-blue { --card-tint: rgba(76, 127, 209, 0.17); --card-tint-hover: rgba(76, 127, 209, 0.24); }
+    .card.color-purple, .card-back.color-purple { --card-tint: rgba(138, 91, 209, 0.17); --card-tint-hover: rgba(138, 91, 209, 0.24); }
 
     .card-back { transform: rotateY(180deg); }
 
@@ -458,6 +469,67 @@
     }
 
     .note-label span:last-child, .edit-label span:last-child { color: var(--faint); }
+
+
+    .color-code-wrap {
+      border-top: 1px solid var(--line-2);
+      padding-top: 10px;
+    }
+
+    .color-code-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 26px;
+    }
+
+    .color-code-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #1b1b1b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      opacity: 0.62;
+      transition: opacity 140ms ease, background 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+
+    body.theme-light .color-code-btn { background: #d7d7d7; }
+
+    .color-code-wrap:hover .color-code-btn,
+    .color-code-btn:focus-visible {
+      opacity: 1;
+    }
+
+    .color-code-btn:hover { transform: translateY(-1px); border-color: var(--white); }
+    .color-code-btn.is-active { border-color: var(--white); box-shadow: 0 0 0 1px var(--black), 0 0 0 2px var(--white); }
+
+    .color-code-btn[data-color="red"] { --swatch: var(--code-red); }
+    .color-code-btn[data-color="gold"] { --swatch: var(--code-gold); }
+    .color-code-btn[data-color="green"] { --swatch: var(--code-green); }
+    .color-code-btn[data-color="blue"] { --swatch: var(--code-blue); }
+    .color-code-btn[data-color="purple"] { --swatch: var(--code-purple); }
+
+    .color-code-wrap:hover .color-code-btn[data-color]:not([data-color="none"]),
+    .color-code-btn[data-color]:not([data-color="none"]):focus-visible {
+      background: var(--swatch);
+      border-color: var(--swatch);
+    }
+
+    .color-code-btn[data-color="none"] {
+      background: transparent;
+      border-color: var(--line);
+    }
+
+    .color-code-btn[data-color="none"] svg {
+      width: 12px;
+      height: 12px;
+      stroke: var(--muted);
+    }
 
     .edit-grid {
       display: grid;
@@ -1038,6 +1110,15 @@
           <option value="Medium">MEDIUM</option>
           <option value="Low">LOW</option>
         </select>
+        <select id="colorFilter">
+          <option value="All">ALL COLORS</option>
+          <option value="none">NO COLOR</option>
+          <option value="red">RED</option>
+          <option value="gold">GOLD</option>
+          <option value="green">GREEN</option>
+          <option value="blue">BLUE</option>
+          <option value="purple">PURPLE</option>
+        </select>
         <select id="sortSelect">
           <option value="auto">PRIORITY + A-Z</option>
           <option value="name">A-Z</option>
@@ -1156,6 +1237,7 @@
     const SYNC_INTERVAL_MS = 60000;
     const OLD_STORAGE_KEY = "artistOutreachDashboard.v2";
     const priorityOrder = { USER: 4, High: 3, Medium: 2, Low: 1 };
+    const colorCodes = ["none", "red", "gold", "green", "blue", "purple"];
     const editingCards = new Set();
     const sendExpandedCards = new Set();
     const sendWarningTimers = new Map();
@@ -1198,6 +1280,7 @@
     const searchInput = document.getElementById("searchInput");
     const regionFilter = document.getElementById("regionFilter");
     const priorityFilter = document.getElementById("priorityFilter");
+    const colorFilter = document.getElementById("colorFilter");
     const sortSelect = document.getElementById("sortSelect");
     const resultCount = document.getElementById("resultCount");
     const saveStatus = document.getElementById("saveStatus");
@@ -1320,6 +1403,10 @@
       return confirmedSendEntries(artist.sendEntries).length > 0;
     }
 
+    function normalizeColorCode(value) {
+      return colorCodes.includes(value) ? value : "none";
+    }
+
     function normalizeArtist(artist, persist = false) {
       const id = artist.id || slug(artist.name || "artist");
       return {
@@ -1328,6 +1415,7 @@
         region: artist.region || "User Added",
         lane: artist.lane || "User-added artist",
         priority: artist.priority || "USER",
+        colorCode: normalizeColorCode(artist.colorCode || artist.color || "none"),
         fit: artist.fit || "",
         pitch: artist.pitch || "",
         size: artist.size || "User target",
@@ -1474,6 +1562,7 @@
       artists.forEach(artist => {
         payload[artist.id] = {
           priority: artist.priority,
+          colorCode: normalizeColorCode(artist.colorCode || "none"),
           note: artist.note || "",
           email: artist.email || "",
           sendEntries: confirmedSendEntries(artist.sendEntries),
@@ -1516,6 +1605,7 @@
           ...artist,
           id,
           priority: existing.priority || artist.priority,
+          colorCode: normalizeColorCode(existing.colorCode || artist.colorCode || "none"),
           note: existing.note || "",
           email: existing.email || artist.email || "",
           sendEntries: normalizeSendEntries(existing.sendEntries || artist.sendEntries),
@@ -1542,11 +1632,14 @@
       const query = searchInput.value.toLowerCase().trim();
       const region = regionFilter.value;
       const priority = priorityFilter.value;
+      const selectedColor = colorFilter.value;
 
       return artists.filter(artist => {
-        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.size} ${(artist.customTags || []).join(" ")} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
+        const artistColor = normalizeColorCode(artist.colorCode || "none");
+        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.size} ${artistColor} ${(artist.customTags || []).join(" ")} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
         const priorityMatch = priority === "All" || (priority === "SENT" ? hasSent(artist) : artist.priority === priority);
-        return (!query || text.includes(query)) && (region === "All" || artist.region === region) && priorityMatch;
+        const colorMatch = selectedColor === "All" || artistColor === selectedColor;
+        return (!query || text.includes(query)) && (region === "All" || artist.region === region) && priorityMatch && colorMatch;
       });
     }
 
@@ -1608,6 +1701,22 @@
       `;
     }
 
+
+    function noColorIconSvg() {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M8 8l8 8"></path><path d="M16 8l-8 8"></path></svg>';
+    }
+
+    function renderColorControls(artist) {
+      const selected = normalizeColorCode(artist.colorCode || "none");
+      const buttons = colorCodes.map(color => {
+        const active = selected === color ? " is-active" : "";
+        const label = color === "none" ? "No color" : color;
+        const inside = color === "none" ? noColorIconSvg() : "";
+        return `<button class="color-code-btn${active}" type="button" data-color="${color}" title="${label}" aria-label="${label}" onclick="changeColorCode('${artist.id}', '${color}')">${inside}</button>`;
+      }).join("");
+      return `<div class="color-code-wrap"><div class="color-code-row">${buttons}</div></div>`;
+    }
+
     function deleteIconSvg() {
       return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>';
     }
@@ -1616,10 +1725,11 @@
       const cls = `priority-${artist.priority.toLowerCase()}`;
       const emailText = artist.email ? escapeHtml(artist.email) : "NO EMAIL";
       const emailClass = artist.email ? "email-display" : "email-display empty-email";
+      const colorClass = `color-${normalizeColorCode(artist.colorCode || "none")}`;
       return `
         <section class="card-shell ${sendExpandedCards.has(artist.id) ? "send-expanded" : ""}" data-id="${artist.id}" onmouseleave="collapseSendEntries('${artist.id}')">
           <div class="card-flipper">
-            <article class="card">
+            <article class="card ${colorClass}">
               <div class="card-header">
                 <div>
                   <div class="title-row">
@@ -1658,13 +1768,15 @@
                 <textarea placeholder="NOTES" oninput="changeNote('${artist.id}', this.value)">${escapeHtml(artist.note || "")}</textarea>
               </div>
 
+              ${renderColorControls(artist)}
+
               <button class="delete-artist-btn" title="Delete artist" onclick="deleteArtist('${artist.id}')">
                 <span class="delete-icon">${deleteIconSvg()}</span>
                 <span class="delete-text">DELETE</span>
               </button>
             </article>
 
-            <article class="card-back">
+            <article class="card-back ${colorClass}">
               <div class="card-header">
                 <div>
                   <div class="title-row">
@@ -1720,6 +1832,15 @@
           </div>
         </section>
       `;
+    }
+
+
+    function changeColorCode(id, color) {
+      const artist = getArtistById(id);
+      if (!artist) return;
+      artist.colorCode = normalizeColorCode(color);
+      scheduleSave();
+      renderArtists();
     }
 
     function getArtistById(id) {
@@ -2083,6 +2204,7 @@
         size: "User target",
         email: document.getElementById("newEmail").value.trim(),
         note: "",
+        colorCode: "none",
         sendEntries: [],
         socials: {
           instagram: document.getElementById("newInstagram").value.trim() || `https://www.instagram.com/`,
@@ -2110,6 +2232,7 @@
     searchInput.addEventListener("input", renderArtists);
     regionFilter.addEventListener("change", renderArtists);
     priorityFilter.addEventListener("change", renderArtists);
+    colorFilter.addEventListener("change", renderArtists);
     sortSelect.addEventListener("change", renderArtists);
 
     window.openAddArtistModal = openAddArtistModal;
@@ -2118,6 +2241,7 @@
     window.addArtistFromModal = addArtistFromModal;
     window.flipCard = flipCard;
     window.changePriority = changePriority;
+    window.changeColorCode = changeColorCode;
     window.changeNote = changeNote;
     window.changeEditableField = changeEditableField;
     window.changeSocial = changeSocial;
