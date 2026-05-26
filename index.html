@@ -346,9 +346,25 @@
 
     .auth-gate {
       min-height: calc(100vh - 36px);
+      display: block;
+    }
+
+    .auth-container {
+      min-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-hero {
+      flex: 0 0 auto;
+    }
+
+    .auth-gate-body {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 24px 0 52px;
     }
 
     .auth-panel {
@@ -374,7 +390,18 @@
 
     .auth-panel .auth-btn {
       width: 100%;
+      border: 1px solid var(--white);
+      background: var(--white);
+      color: var(--black);
       padding: 14px;
+      box-shadow: 6px 6px 0 var(--line);
+    }
+
+    .auth-panel .auth-btn:hover {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--white);
+      box-shadow: none;
     }
 
     .grid {
@@ -1367,13 +1394,19 @@
 </head>
 <body>
   <section class="auth-gate" id="authGate">
-    <div class="auth-panel">
-      <h1 class="site-logo auth-logo" aria-label="MONEYOVERALL">
-        <img class="logo-img" src="MOA-logo.svg" alt="MONEYOVERALL" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');" />
-        <span class="logo-fallback">MONEYOVERALL</span>
-      </h1>
-      <p id="authGateNotice">Sign in to view dashboard.</p>
-      <button class="auth-btn" id="gateAuthBtn" onclick="toggleAuth()">Sign in Google</button>
+    <div class="container auth-container">
+      <section class="hero auth-hero">
+        <h1 class="site-logo" aria-label="MONEYOVERALL">
+          <img class="logo-img" src="MOA-logo.svg" alt="MONEYOVERALL" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');" />
+          <span class="logo-fallback">MONEYOVERALL</span>
+        </h1>
+      </section>
+      <div class="auth-gate-body">
+        <div class="auth-panel">
+          <p id="authGateNotice">Sign in to view dashboard.</p>
+          <button class="auth-btn gate-auth-btn" id="gateAuthBtn" onclick="toggleAuth()">Sign in Google</button>
+        </div>
+      </div>
     </div>
   </section>
 
