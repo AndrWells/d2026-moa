@@ -207,6 +207,57 @@
       color: var(--white);
     }
 
+
+
+    .site-logo,
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-width: 0;
+      text-decoration: none;
+      color: var(--white);
+    }
+
+    .site-logo {
+      margin: 0;
+    }
+
+    .logo-img {
+      display: block;
+      width: clamp(160px, 18vw, 260px);
+      height: auto;
+      max-height: 64px;
+      object-fit: contain;
+      filter: invert(1);
+    }
+
+    body.theme-light .logo-img { filter: none; }
+
+    .auth-panel .logo-img {
+      width: min(260px, 82vw);
+      margin: 0 auto 14px;
+    }
+
+    .logo-img.is-hidden { display: none; }
+
+    .logo-fallback {
+      display: none;
+      font-size: clamp(24px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -2px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .auth-panel .logo-fallback {
+      font-size: clamp(24px, 5vw, 38px);
+      margin-bottom: 14px;
+    }
+
+    .logo-fallback.is-visible { display: inline-block; }
+
     .hero-actions {
       display: flex;
       align-items: center;
@@ -1232,7 +1283,10 @@
 <body>
   <section class="auth-gate" id="authGate">
     <div class="auth-panel">
-      <h1>MONEYOVERALL</h1>
+      <h1 class="site-logo auth-logo" aria-label="MONEYOVERALL">
+        <img class="logo-img" src="MOA-logo.svg" alt="MONEYOVERALL" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');" />
+        <span class="logo-fallback">MONEYOVERALL</span>
+      </h1>
       <p id="authGateNotice">Sign in to view dashboard.</p>
       <button class="auth-btn" id="gateAuthBtn" onclick="toggleAuth()">Sign in Google</button>
     </div>
@@ -1241,7 +1295,10 @@
   <div id="appShell" class="hidden">
   <div class="container">
     <section class="hero">
-      <h1>MONEYOVERALL</h1>
+      <h1 class="site-logo" aria-label="MONEYOVERALL">
+        <img class="logo-img" src="MOA-logo.svg" alt="MONEYOVERALL" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');" />
+        <span class="logo-fallback">MONEYOVERALL</span>
+      </h1>
       <div class="hero-actions">
         <button class="nav-btn" id="dashboardNavBtn" onclick="showDashboardPage()">Dashboard</button>
         <button class="nav-btn" id="visualsNavBtn" onclick="showVisualsPage()">Visuals</button>
@@ -2628,4 +2685,3 @@
   </script>
 </body>
 </html>
-<!--redeploy-->
