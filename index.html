@@ -79,6 +79,8 @@
     .container { max-width: 1680px; margin: 0 auto; }
 
     .hero {
+      position: relative;
+      min-height: 76px;
       background: transparent;
       border: 0;
       border-bottom: 1px solid var(--line);
@@ -86,7 +88,7 @@
       margin-bottom: 12px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 12px;
     }
 
@@ -221,6 +223,11 @@
 
     .site-logo {
       margin: 0;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
     }
 
     .logo-img {
@@ -264,6 +271,43 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      margin-left: auto;
+      z-index: 3;
+    }
+
+
+    .mobile-nav-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 0;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 1001;
+    }
+
+    .mobile-nav-toggle:hover,
+    .mobile-nav-toggle.is-open {
+      border-color: var(--white);
+      color: var(--white);
+      background: var(--panel-2);
+    }
+
+    .mobile-nav-toggle svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      transition: transform 180ms ease;
+    }
+
+    .mobile-nav-toggle.is-open svg {
+      transform: rotate(180deg);
     }
 
     .settings-page {
@@ -702,7 +746,8 @@
     }
 
     body.theme-light .mobile-ui-backdrop { background: rgba(0,0,0,0.38); }
-    body.mobile-filter-active .mobile-ui-backdrop {
+    body.mobile-filter-active .mobile-ui-backdrop,
+    body.mobile-nav-active .mobile-ui-backdrop {
       display: block;
       opacity: 1;
       pointer-events: auto;
@@ -1271,9 +1316,49 @@
 
     @media (max-width: 760px) {
       body { padding: 10px; }
-      .hero { padding: 14px; flex-direction: column; align-items: stretch; }
-      .hero-actions { width: 100%; flex-direction: column; align-items: stretch; }
-      .hero .auth-btn, .hero .nav-btn { width: 100%; }
+      .hero {
+        min-height: 66px;
+        padding: 14px 0;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      .site-logo {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .logo-img { width: min(190px, 58vw); max-height: 44px; }
+      .mobile-nav-toggle { display: inline-flex; }
+      .hero-actions {
+        position: fixed;
+        top: 76px;
+        right: 10px;
+        z-index: 998;
+        width: min(320px, calc(100vw - 20px));
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 10px;
+        background: rgba(16,16,16,0.96);
+        border: 1px solid var(--line);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-8px) scale(0.98);
+        transform-origin: top right;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+      body.theme-light .hero-actions { background: rgba(255,255,255,0.96); }
+      body.mobile-nav-active .hero-actions {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+      }
+      .hero .auth-btn, .hero .nav-btn {
+        width: 100%;
+        text-align: left;
+        padding: 12px 10px;
+      }
       .settings-row { grid-template-columns: 1fr; }
       .grid, .stats, .filters-grid { grid-template-columns: 1fr; }
       .count-row { flex-direction: column; align-items: flex-start; }
@@ -1299,6 +1384,9 @@
         <img class="logo-img" src="MOA-logo.svg" alt="MONEYOVERALL" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');" />
         <span class="logo-fallback">MONEYOVERALL</span>
       </h1>
+      <button class="mobile-nav-toggle" id="mobileNavToggle" type="button" aria-label="Open navigation" aria-expanded="false" onclick="toggleMobileNav()">
+        <svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M5 8l7 7 7-7"></path><path d="M7 4c2 1.5 4 1.5 6 0s4-1.5 6 0"></path></svg>
+      </button>
       <div class="hero-actions">
         <button class="nav-btn" id="dashboardNavBtn" onclick="showDashboardPage()">Dashboard</button>
         <button class="nav-btn" id="visualsNavBtn" onclick="showVisualsPage()">Visuals</button>
@@ -1402,7 +1490,7 @@
     </div>
   </div>
 
-  <div class="mobile-ui-backdrop" id="mobileUiBackdrop" onclick="closeMobileFilters()"></div>
+  <div class="mobile-ui-backdrop" id="mobileUiBackdrop" onclick="closeMobileOverlays()"></div>
   <button class="mobile-filter-toggle" id="mobileFilterToggle" type="button" aria-controls="filtersPanel" aria-expanded="false" onclick="toggleMobileFilters()">Filters</button>
   <button class="add-artist-btn" id="addArtistFloatingBtn" onclick="openAddArtistModal()">+ Add Artist</button>
 
@@ -1550,6 +1638,7 @@
     const sortSelect = document.getElementById("sortSelect");
     const filtersPanel = document.getElementById("filtersPanel");
     const mobileFilterToggle = document.getElementById("mobileFilterToggle");
+    const mobileNavToggle = document.getElementById("mobileNavToggle");
     const resultCount = document.getElementById("resultCount");
     const saveStatus = document.getElementById("saveStatus");
     const settingsPage = document.getElementById("settingsPage");
@@ -1602,6 +1691,31 @@
       document.documentElement.style.setProperty("--mobile-filter-panel-height", `${height}px`);
     }
 
+    function closeMobileNav() {
+      document.body.classList.remove("mobile-nav-active");
+      if (mobileNavToggle) {
+        mobileNavToggle.classList.remove("is-open");
+        mobileNavToggle.setAttribute("aria-expanded", "false");
+        mobileNavToggle.setAttribute("aria-label", "Open navigation");
+      }
+    }
+
+    function toggleMobileNav() {
+      closeMobileFilters();
+      const isOpen = !document.body.classList.contains("mobile-nav-active");
+      document.body.classList.toggle("mobile-nav-active", isOpen);
+      if (mobileNavToggle) {
+        mobileNavToggle.classList.toggle("is-open", isOpen);
+        mobileNavToggle.setAttribute("aria-expanded", String(isOpen));
+        mobileNavToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+      }
+    }
+
+    function closeMobileOverlays() {
+      closeMobileFilters();
+      closeMobileNav();
+    }
+
     function closeMobileFilters() {
       if (filtersPanel) filtersPanel.classList.remove("is-mobile-open");
       document.body.classList.remove("mobile-filter-active");
@@ -1614,6 +1728,7 @@
     }
 
     function toggleMobileFilters() {
+      closeMobileNav();
       if (!filtersPanel || !mobileFilterToggle) return;
       const isOpen = filtersPanel.classList.toggle("is-mobile-open");
       document.body.classList.toggle("mobile-filter-active", isOpen);
@@ -2649,16 +2764,18 @@
     window.showMapPage = showMapPage;
     window.copyArtistList = copyArtistList;
     window.toggleMobileFilters = toggleMobileFilters;
+    window.toggleMobileNav = toggleMobileNav;
+    window.closeMobileOverlays = closeMobileOverlays;
 
     window.addEventListener("hashchange", routeFromHash);
 
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 980) closeMobileFilters();
+      if (window.innerWidth > 980) closeMobileOverlays();
       else syncMobileFilterPosition();
     });
 
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape") closeMobileFilters();
+      if (event.key === "Escape") closeMobileOverlays();
     });
 
     function startPeriodicCloudSync() {
@@ -2685,4 +2802,3 @@
   </script>
 </body>
 </html>
-
