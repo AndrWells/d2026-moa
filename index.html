@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@DRUSKHI OUTREACH DASHBOARD</title>
+  <title>MONEYOVERALL OUTREACH DASHBOARD</title>
   <style>
     :root {
       --bg: #080808;
@@ -68,12 +68,13 @@
       font-size: 13px;
     }
 
-    .container { max-width: 1500px; margin: 0 auto; }
+    .container { max-width: 1680px; margin: 0 auto; }
 
     .hero {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      padding: 18px;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 18px 0 20px;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
@@ -90,21 +91,24 @@
     }
 
     .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      display: flex;
+      align-items: stretch;
       gap: 8px;
       margin-bottom: 12px;
+      flex-wrap: wrap;
     }
 
     .stat {
       background: var(--panel);
       border: 1px solid var(--line);
-      padding: 14px;
+      padding: 9px 12px;
+      min-width: 118px;
     }
 
     .stat strong {
       display: block;
-      font-size: 24px;
+      font-size: 20px;
+      line-height: 1;
       color: var(--white);
       font-weight: 700;
     }
@@ -174,24 +178,24 @@
 
     .auth-btn,
     .nav-btn {
-      border: 1px solid var(--white);
-      background: var(--white);
-      color: var(--black);
-      padding: 10px 12px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 4px;
       font-family: inherit;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 800;
       text-transform: uppercase;
       cursor: pointer;
       border-radius: 0;
       white-space: nowrap;
+      letter-spacing: 0.7px;
     }
 
     .auth-btn:hover,
     .nav-btn:hover {
-      background: var(--black);
+      background: transparent;
       color: var(--white);
-      border-color: var(--white);
     }
 
     .hero-actions {
@@ -271,19 +275,23 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
     }
 
     .card-shell {
       perspective: 1200px;
-      min-height: 620px;
+      min-height: 600px;
+    }
+
+    .card-shell.send-expanded {
+      min-height: auto;
     }
 
     .card-flipper {
       position: relative;
       width: 100%;
-      min-height: 620px;
+      min-height: 600px;
       transform-style: preserve-3d;
       transition: transform 0.32s ease;
     }
@@ -298,6 +306,7 @@
       border: 1px solid var(--line);
       padding: 14px;
       padding-bottom: 62px;
+      min-height: 600px;
       display: flex;
       flex-direction: column;
       gap: 11px;
@@ -519,7 +528,13 @@
 
     .delete-artist-btn .delete-icon {
       opacity: 1;
-      font-size: 15px;
+    }
+
+    .delete-artist-btn .delete-icon svg {
+      width: 15px;
+      height: 15px;
+      display: block;
+      stroke: currentColor;
     }
 
     .delete-artist-btn .delete-text {
@@ -646,7 +661,219 @@
       border-color: var(--white);
     }
 
-    @media (max-width: 1100px) {
+
+
+    .summary-globe-btn {
+      width: 40px;
+      min-width: 40px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .summary-globe-btn:hover {
+      border-color: var(--white);
+      color: var(--white);
+      background: var(--panel-2);
+    }
+
+    .summary-globe-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+
+    .send-wrap {
+      border-top: 1px solid var(--line-2);
+      padding-top: 10px;
+      position: relative;
+    }
+
+    .send-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .send-entries { display: grid; gap: 6px; }
+
+    .send-row {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .send-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .send-row input[type="checkbox"]:checked::after {
+      content: "";
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+
+    .send-row input[type="date"] { padding: 7px; font-size: 11px; }
+
+    .send-add-btn {
+      border: 1px solid var(--line);
+      background: var(--black);
+      color: var(--text);
+      padding: 8px;
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+      margin-top: 7px;
+      width: 100%;
+    }
+
+    .send-add-btn:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    .show-send-all {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 7px 0 0;
+      width: auto;
+    }
+
+    .show-send-all:hover { color: var(--white); }
+
+    .send-warning {
+      position: absolute;
+      left: 10px;
+      top: 30px;
+      z-index: 8;
+      border: 1px solid var(--white);
+      background: var(--black);
+      color: var(--white);
+      padding: 7px 9px;
+      font-size: 11px;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .send-warning.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .map-page {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line-2);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .map-header h2 {
+      text-transform: uppercase;
+      font-size: 22px;
+      letter-spacing: -0.8px;
+    }
+
+    .map-shell {
+      position: relative;
+      width: 100%;
+      min-height: 540px;
+      border: 1px solid var(--line);
+      background: var(--black);
+      overflow: hidden;
+    }
+
+    .world-map {
+      width: 100%;
+      height: 540px;
+      display: block;
+    }
+
+    .map-land {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 1.4;
+    }
+
+    .map-dot {
+      stroke: var(--black);
+      stroke-width: 1.5;
+    }
+
+    .map-dot.sent {
+      fill: #37d16f;
+      animation: sentPulse 1.9s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .map-dot.unsent { fill: var(--white); }
+
+    @keyframes sentPulse {
+      0%, 100% { opacity: 0.45; r: 4; }
+      50% { opacity: 1; r: 7; }
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+      text-transform: uppercase;
+      padding: 36px 18px 26px;
+      margin-top: 18px;
+      border-top: 1px solid var(--line-2);
+    }
+
+    @media (max-width: 1320px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 980px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
       .filters-grid { grid-template-columns: 1fr 1fr; }
       .links { grid-template-columns: repeat(2, 1fr); }
@@ -666,7 +893,7 @@
 <body>
   <section class="auth-gate" id="authGate">
     <div class="auth-panel">
-      <h1>@DRUSKHI OUTREACH DASHBOARD</h1>
+      <h1>MONEYOVERALL</h1>
       <p id="authGateNotice">Sign in to view dashboard.</p>
       <button class="auth-btn" id="gateAuthBtn" onclick="toggleAuth()">Sign in Google</button>
     </div>
@@ -675,7 +902,7 @@
   <div id="appShell" class="hidden">
   <div class="container">
     <section class="hero">
-      <h1>@DRUSKHI OUTREACH DASHBOARD</h1>
+      <h1>MONEYOVERALL</h1>
       <div class="hero-actions">
         <button class="nav-btn" id="dashboardNavBtn" onclick="showDashboardPage()">Dashboard</button>
         <button class="nav-btn" id="settingsNavBtn" onclick="showSettingsPage()">Settings</button>
@@ -695,12 +922,33 @@
       </div>
     </section>
 
+    <section class="map-page hidden" id="mapPage">
+      <div class="map-header">
+        <h2>Artist Map</h2>
+        <button class="nav-btn" onclick="showDashboardPage()">Back to Dashboard</button>
+      </div>
+      <div class="map-shell">
+        <svg class="world-map" id="worldMap" viewBox="0 0 1000 520" role="img" aria-label="World map of outreach artists">
+          <path class="map-land" d="M128 116 L202 82 L278 96 L322 144 L294 192 L224 196 L196 244 L142 232 L94 178 Z" />
+          <path class="map-land" d="M252 244 L314 286 L342 356 L302 446 L244 414 L222 336 Z" />
+          <path class="map-land" d="M458 108 L560 74 L682 96 L744 152 L724 226 L612 226 L560 190 L488 204 L422 160 Z" />
+          <path class="map-land" d="M516 226 L612 238 L668 306 L644 414 L574 438 L512 360 L486 280 Z" />
+          <path class="map-land" d="M720 242 L814 252 L880 320 L852 390 L766 380 L718 314 Z" />
+          <path class="map-land" d="M800 388 L874 408 L912 456 L862 474 L796 438 Z" />
+          <path class="map-land" d="M420 76 L468 52 L514 72 L494 102 L442 108 Z" />
+          <g id="mapDots"></g>
+        </svg>
+      </div>
+      <div class="map-legend"><span>Green pulse = SENT</span><span>White = not sent</span></div>
+    </section>
+
     <div id="dashboardPage">
     <section class="stats">
       <div class="stat"><strong id="totalStat">0</strong><span>Total</span></div>
-      <div class="stat"><strong id="userStat">0</strong><span>User</span></div>
-      <div class="stat"><strong id="highStat">0</strong><span>High</span></div>
-      <div class="stat"><strong id="usStat">0</strong><span>U.S.</span></div>
+      <div class="stat"><strong id="sentStat">0</strong><span>Sent</span></div>
+      <button class="summary-globe-btn" title="Open artist map" aria-label="Open artist map" onclick="showMapPage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c3 3 3 15 0 18"></path><path d="M12 3c-3 3-3 15 0 18"></path></svg>
+      </button>
     </section>
 
     <section class="filters">
@@ -709,6 +957,7 @@
         <select id="regionFilter"><option value="All">ALL REGIONS</option></select>
         <select id="priorityFilter">
           <option value="All">ALL PRIORITIES</option>
+          <option value="SENT">SENT</option>
           <option value="USER">USER</option>
           <option value="High">HIGH</option>
           <option value="Medium">MEDIUM</option>
@@ -784,14 +1033,6 @@
           <span class="form-label">YouTube</span>
           <input id="newYouTube" type="url" placeholder="YOUTUBE URL" />
         </label>
-        <label class="full">
-          <span class="form-label">Fit</span>
-          <input id="newFit" type="text" placeholder="FIT" value="Added by user. Verify fit, current activity, and best contact route." />
-        </label>
-        <label class="full">
-          <span class="form-label">Pitch</span>
-          <input id="newPitch" type="text" placeholder="PITCH" value="Use a short message and lead with why the song fits their sound." />
-        </label>
       </div>
 
       <div class="modal-actions">
@@ -801,6 +1042,10 @@
     </div>
   </div>
 
+    <footer class="footer">
+      <div>MONEYOVERALL © 2026 All Rights Reserved.</div>
+      <div>Authorized internal use only.</div>
+    </footer>
   </div>
 
   <script type="module">
@@ -835,6 +1080,8 @@
     const OLD_STORAGE_KEY = "artistOutreachDashboard.v2";
     const priorityOrder = { USER: 4, High: 3, Medium: 2, Low: 1 };
     const editingCards = new Set();
+    const sendExpandedCards = new Set();
+    const sendWarningTimers = new Map();
 
     const baseArtists = [
       { name: "Alyssa Sinacori", region: "User Added", lane: "User-added artist", priority: "USER", fit: "Added by user. Verify fit, current activity, and best contact route.", pitch: "Check recent posts and decide whether to pitch the reference directly or build rapport first.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/alyssa_sinacori/", tiktok: "https://www.tiktok.com/search?q=Alyssa%20Sinacori", spotify: "https://open.spotify.com/search/Alyssa%20Sinacori", youtube: "https://www.youtube.com/results?search_query=Alyssa+Sinacori" } },
@@ -879,6 +1126,7 @@
     const saveStatus = document.getElementById("saveStatus");
     const settingsPage = document.getElementById("settingsPage");
     const dashboardPage = document.getElementById("dashboardPage");
+    const mapPage = document.getElementById("mapPage");
     const themeSelect = document.getElementById("themeSelect");
     const appShell = document.getElementById("appShell");
     const authGate = document.getElementById("authGate");
@@ -910,12 +1158,21 @@
 
     function showSettingsPage() {
       dashboardPage.classList.add("hidden");
+      mapPage.classList.add("hidden");
       settingsPage.classList.remove("hidden");
     }
 
     function showDashboardPage() {
       settingsPage.classList.add("hidden");
+      mapPage.classList.add("hidden");
       dashboardPage.classList.remove("hidden");
+    }
+
+    function showMapPage() {
+      settingsPage.classList.add("hidden");
+      dashboardPage.classList.add("hidden");
+      mapPage.classList.remove("hidden");
+      renderMapDots();
     }
     function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -949,6 +1206,18 @@
       localStorage.setItem(DELETED_ARTISTS_KEY, JSON.stringify(deletedArtistIds));
     }
 
+    function normalizeSendEntries(entries) {
+      if (!Array.isArray(entries)) return [];
+      return entries.map(entry => ({
+        checked: Boolean(entry && entry.checked),
+        date: entry && entry.date ? String(entry.date) : ""
+      })).filter(entry => entry.date || entry.checked);
+    }
+
+    function hasSent(artist) {
+      return Array.isArray(artist.sendEntries) && artist.sendEntries.length > 0;
+    }
+
     function normalizeArtist(artist) {
       const id = artist.id || slug(artist.name || "artist");
       return {
@@ -962,6 +1231,7 @@
         size: artist.size || "User target",
         email: artist.email || "",
         note: artist.note || "",
+        sendEntries: normalizeSendEntries(artist.sendEntries),
         customTags: Array.isArray(artist.customTags) ? artist.customTags : [],
         socials: {
           instagram: artist.socials?.instagram || "https://www.instagram.com/",
@@ -1104,6 +1374,7 @@
           priority: artist.priority,
           note: artist.note || "",
           email: artist.email || "",
+          sendEntries: normalizeSendEntries(artist.sendEntries),
           socials: artist.socials || {},
           customTags: artist.customTags || []
         };
@@ -1145,6 +1416,7 @@
           priority: existing.priority || artist.priority,
           note: existing.note || "",
           email: existing.email || artist.email || "",
+          sendEntries: normalizeSendEntries(existing.sendEntries || artist.sendEntries),
           socials: { ...artist.socials, ...(existing.socials || {}) },
           customTags: Array.isArray(existing.customTags) ? existing.customTags : (artist.customTags || [])
         };
@@ -1170,8 +1442,9 @@
       const priority = priorityFilter.value;
 
       return artists.filter(artist => {
-        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.fit} ${artist.pitch} ${artist.size} ${(artist.customTags || []).join(" ")} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
-        return (!query || text.includes(query)) && (region === "All" || artist.region === region) && (priority === "All" || artist.priority === priority);
+        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.size} ${(artist.customTags || []).join(" ")} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
+        const priorityMatch = priority === "All" || (priority === "SENT" ? hasSent(artist) : artist.priority === priority);
+        return (!query || text.includes(query)) && (region === "All" || artist.region === region) && priorityMatch;
       });
     }
 
@@ -1197,12 +1470,39 @@
         .join("");
     }
 
+    function renderSendEntries(artist) {
+      const entries = normalizeSendEntries(artist.sendEntries);
+      const expanded = sendExpandedCards.has(artist.id);
+      const visibleEntries = expanded ? entries : entries.slice(0, 3);
+      const entryHtml = visibleEntries.map((entry, index) => `
+        <div class="send-row">
+          <input type="checkbox" ${entry.checked ? "checked" : ""} onclick="toggleSendEntryChecked(event, '${artist.id}', ${index})" aria-label="Mark send entry complete" />
+          <input type="date" value="${escapeHtml(entry.date)}" onchange="changeSendEntryDate('${artist.id}', ${index}, this.value)" />
+        </div>
+      `).join("");
+      const emptyHtml = entries.length ? "" : '<div class="send-row"><input type="checkbox" onclick="showSendWarningForId(\'' + artist.id + '\')" aria-label="Add date first" /><input type="date" onchange="createFirstSendEntry(\'' + artist.id + '\', this.value)" /></div>';
+      const showAll = entries.length > 3 && !expanded ? `<button class="show-send-all" onclick="expandSendEntries('${artist.id}')">show all entry</button>` : "";
+      return `
+        <div class="send-wrap">
+          <div class="send-label">Send</div>
+          <div class="send-warning" id="sendWarning-${artist.id}">! add date first</div>
+          <div class="send-entries">${entryHtml || emptyHtml}</div>
+          ${showAll}
+          <button class="send-add-btn" onclick="addSendEntry('${artist.id}')">Send Entry</button>
+        </div>
+      `;
+    }
+
+    function deleteIconSvg() {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>';
+    }
+
     function artistCardHTML(artist) {
       const cls = `priority-${artist.priority.toLowerCase()}`;
       const emailText = artist.email ? escapeHtml(artist.email) : "NO EMAIL";
       const emailClass = artist.email ? "email-display" : "email-display empty-email";
       return `
-        <section class="card-shell" data-id="${artist.id}">
+        <section class="card-shell ${sendExpandedCards.has(artist.id) ? "send-expanded" : ""}" data-id="${artist.id}" onmouseleave="collapseSendEntries('${artist.id}')">
           <div class="card-flipper">
             <article class="card">
               <div class="card-header">
@@ -1221,14 +1521,12 @@
               <div class="tags">
                 <span class="tag">${escapeHtml(artist.lane)}</span>
                 <span class="tag">${escapeHtml(artist.size)}</span>
+                ${hasSent(artist) ? '<span class="tag">SENT</span>' : ''}
                 ${renderCustomTags(artist)}
               </div>
 
-              <p><strong>Fit:</strong> ${escapeHtml(artist.fit)}</p>
-              <p><strong>Pitch:</strong> ${escapeHtml(artist.pitch)}</p>
-
               <div>
-                <div class="note-label"><span>Email</span><span>edit via pencil</span></div>
+                <div class="note-label"><span>Email</span></div>
                 <div class="${emailClass}">${emailText}</div>
               </div>
 
@@ -1239,13 +1537,14 @@
                 <a href="${artist.socials.youtube}" target="_blank" rel="noreferrer">YouTube</a>
               </div>
 
+              ${renderSendEntries(artist)}
+
               <div class="note-wrap">
-                <div class="note-label"><span>Notes</span><span>Autosaved</span></div>
                 <textarea placeholder="NOTES" oninput="changeNote('${artist.id}', this.value)">${escapeHtml(artist.note || "")}</textarea>
               </div>
 
               <button class="delete-artist-btn" title="Delete artist" onclick="deleteArtist('${artist.id}')">
-                <span class="delete-icon">⌫</span>
+                <span class="delete-icon">${deleteIconSvg()}</span>
                 <span class="delete-text">DELETE</span>
               </button>
             </article>
@@ -1299,13 +1598,83 @@
               </div>
 
               <button class="delete-artist-btn" title="Delete artist" onclick="deleteArtist('${artist.id}')">
-                <span class="delete-icon">⌫</span>
+                <span class="delete-icon">${deleteIconSvg()}</span>
                 <span class="delete-text">DELETE</span>
               </button>
             </article>
           </div>
         </section>
       `;
+    }
+
+    function getArtistById(id) {
+      return artists.find(a => a.id === id);
+    }
+
+    function addSendEntry(id) {
+      const artist = getArtistById(id);
+      if (!artist) return;
+      artist.sendEntries = normalizeSendEntries(artist.sendEntries);
+      artist.sendEntries.push({ checked: false, date: "" });
+      sendExpandedCards.add(id);
+      scheduleSave();
+      renderArtists();
+    }
+
+    function createFirstSendEntry(id, value) {
+      const artist = getArtistById(id);
+      if (!artist || !value) return;
+      artist.sendEntries = [{ checked: false, date: value }];
+      scheduleSave();
+      renderArtists();
+    }
+
+    function changeSendEntryDate(id, index, value) {
+      const artist = getArtistById(id);
+      if (!artist) return;
+      artist.sendEntries = normalizeSendEntries(artist.sendEntries);
+      if (!artist.sendEntries[index]) artist.sendEntries[index] = { checked: false, date: "" };
+      artist.sendEntries[index].date = value;
+      if (!value) artist.sendEntries[index].checked = false;
+      artist.sendEntries = normalizeSendEntries(artist.sendEntries);
+      scheduleSave();
+      renderArtists();
+    }
+
+    function toggleSendEntryChecked(event, id, index) {
+      const artist = getArtistById(id);
+      if (!artist) return;
+      artist.sendEntries = normalizeSendEntries(artist.sendEntries);
+      const entry = artist.sendEntries[index];
+      if (!entry || !entry.date) {
+        event.preventDefault();
+        event.currentTarget.checked = false;
+        showSendWarningForId(id);
+        return;
+      }
+      entry.checked = event.currentTarget.checked;
+      scheduleSave();
+      updateStats();
+      renderMapDots();
+    }
+
+    function showSendWarningForId(id) {
+      const bubble = document.getElementById(`sendWarning-${id}`);
+      if (!bubble) return;
+      bubble.classList.add("is-visible");
+      clearTimeout(sendWarningTimers.get(id));
+      sendWarningTimers.set(id, setTimeout(() => bubble.classList.remove("is-visible"), 2400));
+    }
+
+    function expandSendEntries(id) {
+      sendExpandedCards.add(id);
+      renderArtists();
+    }
+
+    function collapseSendEntries(id) {
+      if (!sendExpandedCards.has(id)) return;
+      sendExpandedCards.delete(id);
+      renderArtists();
     }
 
     function flipCard(id, editing) {
@@ -1396,11 +1765,65 @@
       renderArtists();
     }
 
+    const regionCoordinates = {
+      "United States": [205, 190],
+      "User Added": [500, 245],
+      "Australia": [800, 382],
+      "Australia / Pacific": [832, 360],
+      "New Zealand": [885, 420],
+      "United Kingdom": [462, 145],
+      "UK": [462, 145],
+      "Canada": [200, 120],
+      "Europe": [505, 155],
+      "Africa": [545, 300],
+      "Asia": [700, 190],
+      "Pacific": [850, 330]
+    };
+
+    function hashRegionCoordinate(region) {
+      let hash = 0;
+      String(region || "Unknown").split("").forEach(char => hash = ((hash << 5) - hash) + char.charCodeAt(0));
+      const x = 120 + Math.abs(hash % 760);
+      const y = 105 + Math.abs((hash >> 3) % 315);
+      return [x, y];
+    }
+
+    function getRegionCoordinate(region) {
+      return regionCoordinates[region] || hashRegionCoordinate(region);
+    }
+
+    function renderMapDots() {
+      const layer = document.getElementById("mapDots");
+      if (!layer) return;
+      const regionCounts = new Map();
+      const used = [];
+      const dots = artists.map(artist => {
+        const key = artist.region || "Unknown";
+        const count = regionCounts.get(key) || 0;
+        regionCounts.set(key, count + 1);
+        const [baseX, baseY] = getRegionCoordinate(key);
+        const angle = count * 2.399963;
+        const radius = count === 0 ? 0 : 9 + Math.floor(count / 6) * 8;
+        let x = baseX + Math.cos(angle) * radius;
+        let y = baseY + Math.sin(angle) * radius;
+        let attempts = 0;
+        while (used.some(point => Math.hypot(point[0] - x, point[1] - y) < 12) && attempts < 20) {
+          attempts += 1;
+          x = baseX + Math.cos(angle + attempts) * (radius + attempts * 4);
+          y = baseY + Math.sin(angle + attempts) * (radius + attempts * 4);
+        }
+        x = Math.max(20, Math.min(980, x));
+        y = Math.max(20, Math.min(500, y));
+        used.push([x, y]);
+        return `<circle class="map-dot ${hasSent(artist) ? "sent" : "unsent"}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${hasSent(artist) ? 5 : 4}"><title>${escapeHtml(artist.name)} — ${escapeHtml(key)}${hasSent(artist) ? " — SENT" : ""}</title></circle>`;
+      }).join("");
+      layer.innerHTML = dots;
+    }
+
     function updateStats() {
       document.getElementById("totalStat").textContent = artists.length;
-      document.getElementById("userStat").textContent = artists.filter(a => a.priority === "USER").length;
-      document.getElementById("highStat").textContent = artists.filter(a => a.priority === "High").length;
-      document.getElementById("usStat").textContent = artists.filter(a => a.region === "United States").length;
+      document.getElementById("sentStat").textContent = artists.filter(hasSent).length;
+      renderMapDots();
     }
 
     function openAddArtistModal() {
@@ -1422,8 +1845,6 @@
       document.getElementById("newTikTok").value = "";
       document.getElementById("newSpotify").value = "";
       document.getElementById("newYouTube").value = "";
-      document.getElementById("newFit").value = "Added by user. Verify fit, current activity, and best contact route.";
-      document.getElementById("newPitch").value = "Use a short message and lead with why the song fits their sound.";
     }
 
     function addArtistFromModal() {
@@ -1444,11 +1865,12 @@
         region: document.getElementById("newRegion").value.trim() || "User Added",
         lane: document.getElementById("newLane").value.trim() || "User-added artist",
         priority: document.getElementById("newPriority").value || "USER",
-        fit: document.getElementById("newFit").value.trim() || "Added by user. Verify fit, current activity, and best contact route.",
-        pitch: document.getElementById("newPitch").value.trim() || "Use a short message and lead with why the song fits their sound.",
+        fit: "",
+        pitch: "",
         size: "User target",
         email: document.getElementById("newEmail").value.trim(),
         note: "",
+        sendEntries: [],
         socials: {
           instagram: document.getElementById("newInstagram").value.trim() || `https://www.instagram.com/`,
           tiktok: document.getElementById("newTikTok").value.trim() || `https://www.tiktok.com/search?q=${encodeURIComponent(name)}`,
@@ -1489,10 +1911,18 @@
     window.changeCustomTags = changeCustomTags;
     window.openAllLinks = openAllLinks;
     window.deleteArtist = deleteArtist;
+    window.addSendEntry = addSendEntry;
+    window.createFirstSendEntry = createFirstSendEntry;
+    window.changeSendEntryDate = changeSendEntryDate;
+    window.toggleSendEntryChecked = toggleSendEntryChecked;
+    window.showSendWarningForId = showSendWarningForId;
+    window.expandSendEntries = expandSendEntries;
+    window.collapseSendEntries = collapseSendEntries;
     window.toggleAuth = toggleAuth;
     window.changeTheme = changeTheme;
     window.showSettingsPage = showSettingsPage;
     window.showDashboardPage = showDashboardPage;
+    window.showMapPage = showMapPage;
 
     function startPeriodicCloudSync() {
       setInterval(() => {
