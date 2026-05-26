@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Funk Visuals Generator</title>
+  <title>Phonk Visuals Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,21 +78,13 @@
       gap: 12px;
     }
 
-    .brand h1 {
+    h1 {
       font-size: clamp(24px, 4vw, 44px);
       line-height: 1;
       letter-spacing: -2px;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
       color: var(--white);
-    }
-
-    .brand p {
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
     }
 
     .hero-actions {
@@ -103,7 +95,8 @@
       flex-wrap: wrap;
     }
 
-    .nav-btn {
+    .nav-btn,
+    .auth-btn {
       border: 0;
       background: transparent;
       color: var(--muted);
@@ -119,7 +112,8 @@
       text-decoration: none;
     }
 
-    .nav-btn:hover { color: var(--white); background: transparent; }
+    .nav-btn:hover,
+    .auth-btn:hover { color: var(--white); background: transparent; }
 
     main {
       display: grid;
@@ -376,6 +370,19 @@
       line-height: 1.55;
     }
 
+
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+      text-transform: uppercase;
+      padding: 36px 18px 26px;
+      margin-top: 18px;
+      border-top: 1px solid var(--line-2);
+    }
+
     @media (max-width: 760px) {
       body { padding: 10px; }
       .hero { padding: 14px 0; flex-direction: column; align-items: stretch; }
@@ -387,17 +394,12 @@
 <body class="theme-dark">
   <div class="app">
     <section class="hero">
-      <div class="brand">
-        <h1>Funk Visuals</h1>
-        <p>Fantasy prompt generator / Money Overall utility</p>
-      </div>
+      <h1>MONEYOVERALL</h1>
       <div class="hero-actions">
-        <a class="nav-btn" href="moneyoverall_dashboard_visuals.html">Dashboard</a>
-        <select id="themeSelect" aria-label="Theme">
-          <option value="system">System</option>
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-        </select>
+        <a class="nav-btn" href="index.html#dashboard">Dashboard</a>
+        <a class="nav-btn" href="index.html#visuals">Visuals</a>
+        <a class="nav-btn" href="index.html#settings">Settings</a>
+        <a class="auth-btn" href="index.html#dashboard">Sign in Google</a>
       </div>
     </section>
     <main>
@@ -590,12 +592,15 @@
         <textarea id="output" spellcheck="false"></textarea>
       </section>
     </main>
+    <footer class="footer">
+      <div>MONEYOVERALL © 2026 All Rights Reserved.</div>
+      <div>Authorized internal use only.</div>
+    </footer>
   </div>
 
   <script>
     const output = document.getElementById('output');
     const copied = document.getElementById('copied');
-    const themeSelect = document.getElementById('themeSelect');
     const THEME_KEY = 'artistOutreachDashboard.theme.v1';
 
     function getSystemTheme() {
@@ -606,7 +611,6 @@
       const resolvedTheme = preference === 'system' ? getSystemTheme() : preference;
       document.body.classList.remove('theme-light', 'theme-dark');
       document.body.classList.add(resolvedTheme === 'light' ? 'theme-light' : 'theme-dark');
-      if (themeSelect) themeSelect.value = preference;
     }
 
     function loadThemePreference() {
@@ -618,13 +622,15 @@
       applyThemePreference(value);
     }
 
-    themeSelect.addEventListener('change', () => changeTheme(themeSelect.value));
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
         if (loadThemePreference() === 'system') applyThemePreference('system');
       });
     }
     applyThemePreference(loadThemePreference());
+    window.addEventListener('storage', event => {
+      if (event.key === THEME_KEY) applyThemePreference(loadThemePreference());
+    });
 
     let selectedRatio = '1:1';
     let selectedSubject = 'a powerful fantasy woman with glowing eyes';
