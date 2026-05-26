@@ -637,11 +637,30 @@
       display: none;
     }
 
-    .add-artist-btn {
+    .mobile-ui-backdrop {
       position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 999;
+      inset: 0;
+      z-index: 997;
+      display: none;
+      background: rgba(0,0,0,0.58);
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(0);
+      -webkit-backdrop-filter: blur(0);
+      transition: opacity 180ms ease, backdrop-filter 180ms ease, -webkit-backdrop-filter 180ms ease;
+    }
+
+    body.theme-light .mobile-ui-backdrop { background: rgba(0,0,0,0.38); }
+    body.mobile-filter-active .mobile-ui-backdrop {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+    }
+
+    .add-artist-btn,
+    .mobile-filter-toggle {
       border: 1px solid var(--white);
       background: var(--white);
       color: var(--black);
@@ -652,10 +671,20 @@
       text-transform: uppercase;
       cursor: pointer;
       border-radius: 0;
-      box-shadow: 8px 8px 0 var(--black), 8px 8px 0 1px var(--line);
+      box-shadow: 6px 6px 0 var(--line);
+      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 180ms ease;
     }
 
-    .add-artist-btn:hover {
+    .add-artist-btn {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 999;
+    }
+
+    .add-artist-btn:hover,
+    .mobile-filter-toggle:hover,
+    .mobile-filter-toggle.is-open {
       background: var(--black);
       color: var(--white);
       box-shadow: none;
@@ -665,14 +694,33 @@
       position: fixed;
       inset: 0;
       z-index: 1000;
-      background: rgba(0,0,0,0.78);
-      display: none;
+      background: rgba(0,0,0,0.68);
+      display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(0);
+      -webkit-backdrop-filter: blur(0);
+      transition: opacity 180ms ease, backdrop-filter 180ms ease, -webkit-backdrop-filter 180ms ease;
     }
 
-    .modal.is-open { display: flex; }
+    body.theme-light .modal { background: rgba(0,0,0,0.46); }
+
+    .modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+    }
+
+    .modal-panel {
+      transform: translateY(12px) scale(0.98);
+      transition: transform 180ms ease;
+    }
+
+    .modal.is-open .modal-panel { transform: translateY(0) scale(1); }
 
     .modal-panel {
       width: min(720px, 100%);
@@ -1066,7 +1114,7 @@
         transform: translateY(12px) scale(0.98);
         transform-origin: bottom right;
         transition: opacity 180ms ease, transform 180ms ease;
-        box-shadow: 8px 8px 0 var(--black), 8px 8px 0 1px var(--line);
+        box-shadow: 6px 6px 0 var(--line);
       }
 
       .filters.is-mobile-open {
@@ -1085,28 +1133,10 @@
         justify-content: center;
         width: 132px;
         min-height: 45px;
-        border: 1px solid var(--white);
-        background: var(--white);
-        color: var(--black);
-        padding: 14px 16px;
-        font-family: inherit;
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        cursor: pointer;
-        border-radius: 0;
-        box-shadow: 8px 8px 0 var(--black), 8px 8px 0 1px var(--line);
-      }
-
-      .mobile-filter-toggle:hover,
-      .mobile-filter-toggle.is-open {
-        background: var(--black);
-        color: var(--white);
-        box-shadow: none;
       }
 
       .mobile-filter-toggle.is-open {
-        bottom: calc(82px + min(72vh, 520px) + 10px);
+        bottom: calc(82px + var(--mobile-filter-panel-height, 0px));
       }
 
       .add-artist-btn {
@@ -1232,6 +1262,7 @@
     </div>
   </div>
 
+  <div class="mobile-ui-backdrop" id="mobileUiBackdrop" onclick="closeMobileFilters()"></div>
   <button class="mobile-filter-toggle" id="mobileFilterToggle" type="button" aria-controls="filtersPanel" aria-expanded="false" onclick="toggleMobileFilters()">Filters</button>
   <button class="add-artist-btn" id="addArtistFloatingBtn" onclick="openAddArtistModal()">+ Add Artist</button>
 
@@ -1424,20 +1455,38 @@
       if (mobileFilterToggle) mobileFilterToggle.classList.toggle("hidden", !isVisible);
     }
 
+    function syncMobileFilterPosition() {
+      if (!filtersPanel || !mobileFilterToggle) return;
+      const height = filtersPanel.classList.contains("is-mobile-open") ? filtersPanel.offsetHeight : 0;
+      document.documentElement.style.setProperty("--mobile-filter-panel-height", `${height}px`);
+    }
+
     function closeMobileFilters() {
       if (filtersPanel) filtersPanel.classList.remove("is-mobile-open");
+      document.body.classList.remove("mobile-filter-active");
       if (mobileFilterToggle) {
         mobileFilterToggle.classList.remove("is-open");
+        mobileFilterToggle.textContent = "Filters";
         mobileFilterToggle.setAttribute("aria-expanded", "false");
       }
+      document.documentElement.style.setProperty("--mobile-filter-panel-height", "0px");
     }
 
     function toggleMobileFilters() {
       if (!filtersPanel || !mobileFilterToggle) return;
       const isOpen = filtersPanel.classList.toggle("is-mobile-open");
+      document.body.classList.toggle("mobile-filter-active", isOpen);
       mobileFilterToggle.classList.toggle("is-open", isOpen);
+      mobileFilterToggle.textContent = isOpen ? "Close" : "Filters";
       mobileFilterToggle.setAttribute("aria-expanded", String(isOpen));
-      if (isOpen) setTimeout(() => searchInput.focus({ preventScroll: true }), 0);
+      if (isOpen) {
+        requestAnimationFrame(() => {
+          syncMobileFilterPosition();
+          searchInput.focus({ preventScroll: true });
+        });
+      } else {
+        document.documentElement.style.setProperty("--mobile-filter-panel-height", "0px");
+      }
     }
 
     function showSettingsPage() {
@@ -2434,6 +2483,7 @@
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 980) closeMobileFilters();
+      else syncMobileFilterPosition();
     });
 
     document.addEventListener("keydown", event => {
@@ -2464,5 +2514,3 @@
   </script>
 </body>
 </html>
-
-<!--redeploy-->
